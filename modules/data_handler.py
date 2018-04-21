@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-@author: wooyaa
-@file: data_handler.py
-@time: 2018/3/12 下午10:00
-@license: Apache Licence
-"""
+
 import simplejson as json
 
 flow_data = {

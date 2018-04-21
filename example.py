@@ -1,11 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-@author: wooyaa
-@file: plugin_demo.py
-@time: 2018/1/22 下午4:28
-@license: Apache Licence
-"""
 import subprocess
 import time
 import urlparse

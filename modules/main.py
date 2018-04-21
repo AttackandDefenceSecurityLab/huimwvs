@@ -1,11 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-@author: wooyaa
-@file: main.py
-@time: 2018/1/22 下午5:22
-@license: Apache Licence
-"""
 
 import json
 import argparse
@@ -26,17 +20,7 @@ def main(me_instance):
         me_instance.match()
     else:
         me_instance.check()
-    # try:
-    #     results = [me_instance.result.to_python()]
-    #     json.dumps(results)
-    # except Exception, e:
-    #     print('result 无法被 json 序列化, 请不要将不可序列化的对象填写至 result 中')
-    #     print(e)
-    #     return
 
-    #print me_instance.check
-    #print me_instance.check()==False
-    #print me_instance.check()
     if me_instance.check:
         print('[插件作者]')
         print('\t{p_author}'.format(p_author=str(me_instance.plugin_info.get('author', ''))))
