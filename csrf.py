@@ -208,7 +208,11 @@ class CsrfScan(MePlugin):
         req_data = self.flow_data
         url = req_data['url']
         #print url
-        cookie = req_data['cookie']
+        try: # 请求中可能不存在cookie，提取字典时会导致报错；如果没有cookie，则设置为空
+            cookie = req_data['cookie']
+        except:
+            print "无COOKIE ————————————————"
+            cookie=""
         #print cookie
         csrf=csrfCheck()
         forms=csrf.check(url,cookie)
