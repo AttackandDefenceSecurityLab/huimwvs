@@ -1,0 +1,4 @@
+captcha
+vcode
+yzm
+验证码

@@ -1,0 +1,4 @@
+search
+find
+login
+reg
