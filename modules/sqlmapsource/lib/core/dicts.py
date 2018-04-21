@@ -199,7 +199,7 @@ SQL_STATEMENTS = {
                         "SQL data execution":    (
                              "exec ",
                              "execute ",
-                             "values ", 
+                             "values ",
                              "call ",            ),
 
                         "SQL transaction":       (
