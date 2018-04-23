@@ -67,13 +67,15 @@ class SqliScan(MePlugin):
         cookie=self.flow_data.get('cookie',"")
         ua_string=self.flow_data.get('User-Agent',"")
 
-
-
-        vul_time=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+        request_data=self.flow_data.get('request_data',"")
+        print request_data
         if cookie:
             data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--cookie',cookie,'--user-agent',ua_string]
         else:
             data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--user-agent',ua_string]
+        if request_data:
+            data.append('--data')
+            data.append(request_data)
         try:
             injection=sqlmap.main(data)
         except Exception, e:

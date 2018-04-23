@@ -9,7 +9,8 @@ import time
 
 r=redis.Redis(host='127.0.0.1',port=6379,db=0)
 #while True:
-datas=r.lrange('data',-7,-7)
+datas=r.lrange('data',-1,-1)
+
 #print datas
 for data in datas:
     #print data
@@ -22,32 +23,6 @@ for data in datas:
             print "不存在"
     else:
         print "NO DATA"
-        #time.sleep(10)
-
-
-# datas=r.lrange('data',0,-1)
-# for data in datas:
-#     if len(data) != 0:
-#         jd=json.loads(data)
-#         try:
-#             #print jd['method']
-#             print jd['url']
-#             csrf=main(CsrfScan(jd))
-#             if csrf:
-#                 print csrf
-#             else:
-#                 print "不存在csrf"
-#         except:
-#             pass
-#         print
 
 
 
-# test=r.lrange('data',0,1)
-# jd=json.loads(test[1])
-
-# csrf=main(CsrfScan(jd))
-# if csrf:
-#     print csrf
-# else:
-#     print "不存在csrf"
