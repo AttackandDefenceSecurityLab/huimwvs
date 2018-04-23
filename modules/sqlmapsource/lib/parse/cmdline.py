@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -17,6 +17,7 @@ from optparse import SUPPRESS_HELP
 
 from lib.core.common import checkDeprecatedOptions
 from lib.core.common import checkSystemEncoding
+from lib.core.common import dataToStdout
 from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
 from lib.core.data import cmdLineOptions
@@ -30,20 +31,24 @@ from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import VERSION_STRING
 from lib.core.shell import autoCompletion
 from lib.core.shell import clearHistory
 from lib.core.shell import loadHistory
 from lib.core.shell import saveHistory
 
-def cmdLineParser():
+def cmdLineParser(argv=None):
     """
     This function parses the command line parameters and arguments
     """
 
+    if not argv:
+        argv = sys.argv
+
     checkSystemEncoding()
 
-    _ = getUnicode(os.path.basename(sys.argv[0]), encoding=sys.getfilesystemencoding())
+    _ = getUnicode(os.path.basename(argv[0]), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % _ if " " in _ else _)
@@ -141,11 +146,17 @@ def cmdLineParser():
                            help="HTTP authentication credentials "
                                 "(name:password)")
 
-        request.add_option("--auth-private", dest="authPrivate",
-                           help="HTTP authentication PEM private key file")
+        request.add_option("--auth-file", dest="authFile",
+                           help="HTTP authentication PEM cert/private key file")
 
         request.add_option("--ignore-401", dest="ignore401", action="store_true",
                           help="Ignore HTTP Error 401 (Unauthorized)")
+
+        request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
+                           help="Ignore system default proxy settings")
+
+        request.add_option("--ignore-timeouts", dest="ignoreTimeouts", action="store_true",
+                          help="Ignore connection timeouts")
 
         request.add_option("--proxy", dest="proxy",
                            help="Use a proxy to connect to the target URL")
@@ -157,9 +168,6 @@ def cmdLineParser():
         request.add_option("--proxy-file", dest="proxyFile",
                            help="Load proxy list from a file")
 
-        request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
-                           help="Ignore system default proxy settings")
-
         request.add_option("--tor", dest="tor",
                                   action="store_true",
                                   help="Use Tor anonymity network")
@@ -168,7 +176,7 @@ def cmdLineParser():
                                   help="Set Tor proxy port other than default")
 
         request.add_option("--tor-type", dest="torType",
-                                  help="Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)")
+                                  help="Set Tor proxy type (HTTP, SOCKS4 or SOCKS5 (default))")
 
         request.add_option("--check-tor", dest="checkTor",
                                   action="store_true",
@@ -256,7 +264,7 @@ def cmdLineParser():
                              help="Skip testing for given parameter(s)")
 
         injection.add_option("--skip-static", dest="skipStatic", action="store_true",
-                             help="Skip testing parameters that not appear dynamic")
+                             help="Skip testing parameters that not appear to be dynamic")
 
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
@@ -356,7 +364,7 @@ def cmdLineParser():
         techniques.add_option("--union-from", dest="uFrom",
                               help="Table to use in FROM part of UNION query SQL injection")
 
-        techniques.add_option("--dns-domain", dest="dnsName",
+        techniques.add_option("--dns-domain", dest="dnsDomain",
                               help="Domain name used for DNS exfiltration attack")
 
         techniques.add_option("--second-order", dest="secondOrder",
@@ -460,6 +468,9 @@ def cmdLineParser():
                                action="store_true",
                                help="Exclude DBMS system databases when "
                                     "enumerating tables")
+
+        enumeration.add_option("--pivot-column", dest="pivotColumn",
+                               help="Pivot column name")
 
         enumeration.add_option("--where", dest="dumpWhere",
                                help="Use WHERE condition while table dumping")
@@ -614,6 +625,9 @@ def cmdLineParser():
                             action="store_true",
                             help="Never ask for user input, use the default behaviour")
 
+        general.add_option("--binary-fields", dest="binaryFields",
+                          help="Result fields having binary values (e.g. \"digest\")")
+
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
@@ -659,11 +673,7 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Parse and display DBMS error messages from responses")
 
-        general.add_option("--pivot-column", dest="pivotColumn",
-                               help="Pivot column name")
-
-        general.add_option("--save", dest="saveCmdline",
-                            action="store_true",
+        general.add_option("--save", dest="saveConfig",
                             help="Save options to a configuration INI file")
 
         general.add_option("--scope", dest="scope",
@@ -671,6 +681,9 @@ def cmdLineParser():
 
         general.add_option("--test-filter", dest="testFilter",
                            help="Select tests by payloads and/or titles (e.g. ROW)")
+
+        general.add_option("--test-skip", dest="testSkip",
+                           help="Skip tests by payloads and/or titles (e.g. BENCHMARK)")
 
         general.add_option("--update", dest="updateAll",
                             action="store_true",
@@ -727,12 +740,19 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Safely remove all content from output directory")
 
+        miscellaneous.add_option("--skip-waf", dest="skipWaf",
+                                  action="store_true",
+                                  help="Skip heuristic detection of WAF/IPS/IDS protection")
+
         miscellaneous.add_option("--smart", dest="smart",
                                   action="store_true",
                                   help="Conduct thorough tests only if positive heuristic(s)")
 
         miscellaneous.add_option("--sqlmap-shell", dest="sqlmapShell", action="store_true",
-                            help="Prompt for an interactive sqlmap shell")
+                                  help="Prompt for an interactive sqlmap shell")
+
+        miscellaneous.add_option("--tmp-dir", dest="tmpDir",
+                                  help="Local directory for storing temporary files")
 
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
@@ -742,19 +762,22 @@ def cmdLineParser():
         parser.add_option("--dummy", dest="dummy", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--murphy-rate", dest="murphyRate", type="int",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--pickled-options", dest="pickledOptions",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--disable-precon", dest="disablePrecon", action="store_true",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--binary-fields", dest="binaryFields",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int",
-                          help=SUPPRESS_HELP)
-
         parser.add_option("--force-dns", dest="forceDns", action="store_true",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--force-threads", dest="forceThreads", action="store_true",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
@@ -786,31 +809,32 @@ def cmdLineParser():
 
         # Dirty hack to display longer options without breaking into two lines
         def _(self, *args):
-            _ = parser.formatter._format_option_strings(*args)
-            if len(_) > MAX_HELP_OPTION_LENGTH:
-                _ = ("%%.%ds.." % (MAX_HELP_OPTION_LENGTH - parser.formatter.indent_increment)) % _
-            return _
+            retVal = parser.formatter._format_option_strings(*args)
+            if len(retVal) > MAX_HELP_OPTION_LENGTH:
+                retVal = ("%%.%ds.." % (MAX_HELP_OPTION_LENGTH - parser.formatter.indent_increment)) % retVal
+            return retVal
 
         parser.formatter._format_option_strings = parser.formatter.format_option_strings
         parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser, type(parser))
 
-        # Dirty hack for making a short option -hh
+        # Dirty hack for making a short option '-hh'
         option = parser.get_option("--hh")
         option._short_opts = ["-hh"]
         option._long_opts = []
 
-        # Dirty hack for inherent help message of switch -h
+        # Dirty hack for inherent help message of switch '-h'
         option = parser.get_option("-h")
         option.help = option.help.capitalize().replace("this help", "basic help")
 
-        argv = []
+        _ = []
         prompt = False
         advancedHelp = True
         extraHeaders = []
 
-        for arg in sys.argv:
-            argv.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
+        for arg in argv:
+            _.append(getUnicode(arg, encoding=sys.getfilesystemencoding() or UNICODE_ENCODING))
 
+        argv = _
         checkDeprecatedOptions(argv)
 
         prompt = "--sqlmap-shell" in argv
@@ -845,14 +869,14 @@ def cmdLineParser():
                 if not command:
                     continue
                 elif command.lower() == "clear":
-                    clearHistory()                    
-                    print "[i] history cleared"
+                    clearHistory()
+                    dataToStdout("[i] history cleared\n")
                     saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                 elif command.lower() in ("x", "q", "exit", "quit"):
                     raise SqlmapShellQuitException
                 elif command[0] != '-':
-                    print "[!] invalid option(s) provided"
-                    print "[i] proper example: '-u http://www.site.com/vuln.php?id=1 --banner'"
+                    dataToStdout("[!] invalid option(s) provided\n")
+                    dataToStdout("[i] proper example: '-u http://www.site.com/vuln.php?id=1 --banner'\n")
                 else:
                     saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                     loadHistory(AUTOCOMPLETE_TYPE.SQLMAP)
@@ -862,12 +886,17 @@ def cmdLineParser():
                 for arg in shlex.split(command):
                     argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
             except ValueError, ex:
-                raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex
+                raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex.message
 
-        # Hide non-basic options in basic help case
         for i in xrange(len(argv)):
             if argv[i] == "-hh":
                 argv[i] = "-h"
+            elif len(argv[i]) > 1 and all(ord(_) in xrange(0x2018, 0x2020) for _ in (argv[i][0], argv[i][-1])):
+                dataToStdout("[!] copy-pasting illegal (non-console) quote characters from Internet is, well, illegal (%s)\n" % argv[i])
+                raise SystemExit
+            elif re.search(r"\A-\w=.+", argv[i]):
+                dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
+                raise SystemExit
             elif argv[i] == "-H":
                 if i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
@@ -877,7 +906,7 @@ def cmdLineParser():
             elif argv[i] == "--version":
                 print VERSION_STRING.split('/')[-1]
                 raise SystemExit
-            elif argv[i] == "-h":
+            elif argv[i] in ("-h", "--help"):
                 advancedHelp = False
                 for group in parser.option_groups[:]:
                     found = False
@@ -889,14 +918,22 @@ def cmdLineParser():
                     if not found:
                         parser.option_groups.remove(group)
 
+        for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
+            try:
+                if argv.index(verbosity) == len(argv) - 1 or not argv[argv.index(verbosity) + 1].isdigit():
+                    conf.verbose = verbosity.count('v') + 1
+                    del argv[argv.index(verbosity)]
+            except (IndexError, ValueError):
+                pass
+
         try:
             (args, _) = parser.parse_args(argv)
         except UnicodeEncodeError, ex:
-            print "\n[!] %s" % ex.object.encode("unicode-escape")
+            dataToStdout("\n[!] %s\n" % ex.object.encode("unicode-escape"))
             raise SystemExit
         except SystemExit:
             if "-h" in argv and not advancedHelp:
-                print "\n[!] to see full list of options run with '-hh'"
+                dataToStdout("\n[!] to see full list of options run with '-hh'\n")
             raise
 
         if extraHeaders:
@@ -917,7 +954,7 @@ def cmdLineParser():
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
             args.purgeOutput, args.pickledOptions, args.sitemapUrl)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --wizard, --update, --purge-output or --dependencies), "
-            errMsg += "use -h for basic or -hh for advanced help"
+            errMsg += "use -h for basic or -hh for advanced help\n"
             parser.error(errMsg)
 
         return args
@@ -928,7 +965,7 @@ def cmdLineParser():
     except SystemExit:
         # Protection against Windows dummy double clicking
         if IS_WIN:
-            print "\nPress Enter to continue...",
+            dataToStdout("\nPress Enter to continue...")
             raw_input()
         raise
 

@@ -1,26 +1,22 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import codecs
-
-from ConfigParser import MissingSectionHeaderError
-from ConfigParser import ParsingError
-
 from lib.core.common import checkFile
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import openFile
 from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
+from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.optiondict import optDict
-from lib.core.settings import UNICODE_ENCODING
 
 config = None
 
@@ -73,23 +69,21 @@ def configFileParser(configFile):
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
     except Exception, ex:
-        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getUnicode(ex)
+        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getSafeExString(ex)
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
         errMsg = "missing a mandatory section 'Target' in the configuration file"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    condition = not config.has_option("Target", "direct")
-    condition &= not config.has_option("Target", "url")
-    condition &= not config.has_option("Target", "logFile")
-    condition &= not config.has_option("Target", "bulkFile")
-    condition &= not config.has_option("Target", "googleDork")
-    condition &= not config.has_option("Target", "requestFile")
-    condition &= not config.has_option("Target", "sitemapUrl")
-    condition &= not config.has_option("Target", "wizard")
+    mandatory = False
 
-    if condition:
+    for option in ("direct", "url", "logFile", "bulkFile", "googleDork", "requestFile", "sitemapUrl", "wizard"):
+        if config.has_option("Target", option) and config.get("Target", option) or cmdLineOptions.get(option):
+            mandatory = True
+            break
+
+    if not mandatory:
         errMsg = "missing a mandatory option in the configuration file "
         errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile, sitemapUrl or wizard)"
         raise SqlmapMissingMandatoryOptionException(errMsg)

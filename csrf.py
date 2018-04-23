@@ -22,7 +22,7 @@ class CsrfScan(MePlugin):
             "author": "huim",  # 插件作者
             "ref": [
                 {self.ref.url: "https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)"},  # 引用的url
-                {self.ref.src: "58SRC-201801144"},  # src上的案例
+                {self.ref.src: "http://www.anquan.us/static/bugs/wooyun-2015-095332.html"},  # src上的案例
             ],
             "type": self.type.csrf,  # 漏洞类型
             "severity": self.level.medium,  # 漏洞等级
@@ -35,7 +35,7 @@ class CsrfScan(MePlugin):
         匹配是否调用此插件
         :return:
         """
-        pass
+        return True
 
     def check(self):
         """
@@ -218,14 +218,12 @@ class CsrfScan(MePlugin):
         forms=csrf.check(url,cookie)
         #print forms
         if len(forms) == 0:
-            self.check=False
             return False
         else:
             #print url
             for form in forms:
                 self.plugin_info["target"] += "  --  表单："
                 self.plugin_info["target"] += re.findall("<form[\s\S]*?>",form)[0]
-            self.check=True
             return True
             #csrf.show(result)
 
@@ -238,6 +236,6 @@ class CsrfScan(MePlugin):
 
 
 if __name__ == '__main__':
-    print "你好"
+    #print "你好"
     from modules.main import main
     main(CsrfScan())

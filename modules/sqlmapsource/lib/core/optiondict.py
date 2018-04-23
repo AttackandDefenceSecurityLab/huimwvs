@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -37,11 +37,13 @@ optDict = {
                                "headers":           "string",
                                "authType":          "string",
                                "authCred":          "string",
-                               "authPrivate":       "string",
+                               "authFile":          "string",
+                               "ignore401":         "boolean",
+                               "ignoreProxy":       "boolean",
+                               "ignoreTimeouts":    "boolean",
                                "proxy":             "string",
                                "proxyCred":         "string",
                                "proxyFile":         "string",
-                               "ignoreProxy":       "boolean",
                                "tor":               "boolean",
                                "torPort":           "integer",
                                "torType":           "string",
@@ -104,7 +106,7 @@ optDict = {
                                "uCols":             "string",
                                "uChar":             "string",
                                "uFrom":             "string",
-                               "dnsName":           "string",
+                               "dnsDomain":         "string",
                                "secondOrder":       "string",
                              },
 
@@ -136,6 +138,7 @@ optDict = {
                                "tbl":               "string",
                                "col":               "string",
                                "excludeCol":        "string",
+                               "pivotColumn":       "string",
                                "dumpWhere":         "string",
                                "user":              "string",
                                "excludeSysDbs":     "boolean",
@@ -189,6 +192,7 @@ optDict = {
                                #"xmlFile":           "string",
                                "trafficFile":       "string",
                                "batch":             "boolean",
+                               "binaryFields":      "string",
                                "charset":           "string",
                                "crawlDepth":        "integer",
                                "crawlExclude":      "string",
@@ -201,10 +205,10 @@ optDict = {
                                "hexConvert":        "boolean",
                                "outputDir":         "string",
                                "parseErrors":       "boolean",
-                               "pivotColumn":       "string",
-                               "saveCmdline":       "boolean",
+                               "saveConfig":        "string",
                                "scope":             "string",
                                "testFilter":        "string",
+                               "testSkip":          "string",
                                "updateAll":         "boolean",
                              },
 
@@ -216,22 +220,23 @@ optDict = {
                                "dependencies":      "boolean",
                                "disableColoring":   "boolean",
                                "googlePage":        "integer",
+                               "identifyWaf":       "boolean",
                                "mobile":            "boolean",
                                "offline":           "boolean",
                                "pageRank":          "boolean",
                                "purgeOutput":       "boolean",
+                               "skipWaf":           "boolean",
                                "smart":             "boolean",
+                               "tmpDir":            "string",
                                "wizard":            "boolean",
                                "verbose":           "integer",
                              },
             "Hidden": {
                                "dummy":             "boolean",
-                               "binaryFields":      "string",
+                               "disablePrecon":     "boolean",
                                "profile":           "boolean",
-                               "cpuThrottle":       "integer",
                                "forceDns":          "boolean",
-                               "identifyWaf":       "boolean",
-                               "ignore401":         "boolean",
+                               "murphyRate":        "integer",
                                "smokeTest":         "boolean",
                                "liveTest":          "boolean",
                                "stopFail":          "boolean",

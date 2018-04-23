@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -24,7 +24,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getPublicTypeMembers
-from lib.core.common import getUnicode
+from lib.core.common import getSafeExString
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import intersect
@@ -45,6 +45,7 @@ from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import NOTE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapBaseException
@@ -160,13 +161,29 @@ def _showInjections():
         header += "a total of %d HTTP(s) requests" % kb.testQueryCount
     else:
         header = "sqlmap resumed the following injection point(s) from stored session"
-
     if hasattr(conf, "api"):
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
+        """
+        save the data like:
+        Parameter: id (GET)
+            Type: boolean-based blind
+            Title: AND boolean-based blind - WHERE or HAVING clause
+            Payload: id=1 AND 4256=4256&msg=abc
+        """
+        injectData['data']=kb.injections
+
     else:
         data = "".join(set(map(lambda x: _formatInjection(x), kb.injections))).rstrip("\n")
-        conf.dumper.string(header, data)
+        """
+        save the data like:
+        Parameter: id (GET)
+            Type: boolean-based blind
+            Title: AND boolean-based blind - WHERE or HAVING clause
+            Payload: id=1 AND 4256=4256&msg=abc
+        """
+        injectData['data']=data
 
+        conf.dumper.string(header, data)
     if conf.tamper:
         warnMsg = "changes made by tampering scripts are not "
         warnMsg += "included in shown payload content(s)"
@@ -209,9 +226,8 @@ def _saveToHashDB():
             _[key].data.update(injection.data)
     hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, _.values(), True)
 
-    _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
-    _.update(kb.absFilePaths)
-    hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, _, True)
+    _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True)
+    hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, kb.absFilePaths | (_ if isinstance(_, set) else set()), True)
 
     if not hashDBRetrieve(HASHDB_KEYS.KB_CHARS):
         hashDBWrite(HASHDB_KEYS.KB_CHARS, kb.chars, True)
@@ -226,23 +242,23 @@ def _saveToResultsFile():
     results = {}
     techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
 
-    for inj in kb.injections:
-        if inj.place is None or inj.parameter is None:
+    for injection in kb.injections + kb.falsePositives:
+        if injection.place is None or injection.parameter is None:
             continue
 
-        key = (inj.place, inj.parameter)
+        key = (injection.place, injection.parameter, ';'.join(injection.notes))
         if key not in results:
             results[key] = []
 
-        results[key].extend(inj.data.keys())
+        results[key].extend(injection.data.keys())
 
     for key, value in results.items():
-        place, parameter = key
-        line = "%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), os.linesep)
+        place, parameter, notes = key
+        line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), notes, os.linesep)
         conf.resultsFP.writelines(line)
 
     if not results:
-        line = "%s,,,%s" % (conf.url, os.linesep)
+        line = "%s,,,,%s" % (conf.url, os.linesep)
         conf.resultsFP.writelines(line)
 
 def start():
@@ -251,6 +267,9 @@ def start():
     stability and all GET, POST, Cookie and User-Agent parameters to
     check if they are dynamic and SQL injection affected
     """
+    # return data
+    global injectData
+    injectData={}
 
     if conf.direct:
         initTargetEnv()
@@ -265,7 +284,7 @@ def start():
         errMsg = "you did not edit the configuration file properly, set "
         errMsg += "the target URL, list of targets or google dork"
         logger.error(errMsg)
-        return False
+        return injectData
 
     if kb.targets and len(kb.targets) > 1:
         infoMsg = "sqlmap got a total of %d targets" % len(kb.targets)
@@ -273,7 +292,6 @@ def start():
 
     hostCount = 0
     initialHeaders = list(conf.httpHeaders)
-
     for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
         try:
             conf.url = targetUrl
@@ -312,12 +330,11 @@ def start():
                 infoMsg = "skipping '%s'" % targetUrl
                 logger.info(infoMsg)
                 continue
-
             if conf.multipleTargets:
                 hostCount += 1
 
-                if conf.forms:
-                    message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
+                if conf.forms and conf.method:
+                    message = "[#%d] form:\n%s %s" % (hostCount, conf.method, targetUrl)
                 else:
                     message = "URL %d:\n%s %s%s" % (hostCount, HTTPMETHOD.GET, targetUrl, " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork and conf.pageRank else "")
 
@@ -327,7 +344,7 @@ def start():
                 if conf.data is not None:
                     message += "\n%s data: %s" % ((conf.method if conf.method != HTTPMETHOD.GET else conf.method) or HTTPMETHOD.POST, urlencode(conf.data) if conf.data else "")
 
-                if conf.forms:
+                if conf.forms and conf.method:
                     if conf.method == HTTPMETHOD.GET and targetUrl.find("?") == -1:
                         continue
 
@@ -373,7 +390,6 @@ def start():
                     logger.info(infoMsg)
 
             setupTargetEnv()
-
             if not checkConnection(suppressOutput=conf.forms) or not checkString() or not checkRegexp():
                 continue
 
@@ -387,7 +403,6 @@ def start():
 
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
                 and (kb.injection.place is None or kb.injection.parameter is None):
-
                 if not any((conf.string, conf.notString, conf.regexp)) and PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
@@ -421,6 +436,7 @@ def start():
                     skip |= (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.COOKIE and intersect(PLACE.COOKIE, conf.skip, True) not in ([], None))
+                    skip |= (place == PLACE.HOST and intersect(PLACE.HOST, conf.skip, True) not in ([], None))
 
                     skip &= not (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
@@ -463,7 +479,7 @@ def start():
                             infoMsg = "skipping randomizing %s parameter '%s'" % (paramType, parameter)
                             logger.info(infoMsg)
 
-                        elif parameter in conf.skip:
+                        elif parameter in conf.skip or kb.postHint and parameter.split(' ')[-1] in conf.skip:
                             testSqlInj = False
 
                             infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
@@ -486,7 +502,7 @@ def start():
                             check = checkDynParam(place, parameter, value)
 
                             if not check:
-                                warnMsg = "%s parameter '%s' does not appear dynamic" % (paramType, parameter)
+                                warnMsg = "%s parameter '%s' does not appear to be dynamic" % (paramType, parameter)
                                 logger.warn(warnMsg)
 
                                 if conf.skipStatic:
@@ -520,24 +536,31 @@ def start():
 
                                 injection = checkSqlInjection(place, parameter, value)
                                 proceed = not kb.endDetection
+                                injectable = False
 
-                                if injection is not None and injection.place is not None:
-                                    kb.injections.append(injection)
+                                if getattr(injection, "place", None) is not None:
+                                    if NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE in injection.notes:
+                                        kb.falsePositives.append(injection)
+                                    else:
+                                        injectable = True
 
-                                    # In case when user wants to end detection phase (Ctrl+C)
-                                    if not proceed:
-                                        break
+                                        kb.injections.append(injection)
 
-                                    msg = "%s parameter '%s' " % (injection.place, injection.parameter)
-                                    msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
-                                    test = readInput(msg, default="N")
+                                        # In case when user wants to end detection phase (Ctrl+C)
+                                        if not proceed:
+                                            break
 
-                                    if test[0] not in ("y", "Y"):
-                                        proceed = False
-                                        paramKey = (conf.hostname, conf.path, None, None)
-                                        kb.testedParams.add(paramKey)
-                                else:
-                                    warnMsg = "%s parameter '%s' is not " % (paramType, parameter)
+                                        msg = "%s parameter '%s' " % (injection.place, injection.parameter)
+                                        msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
+                                        test = readInput(msg, default="N")
+
+                                        if test[0] not in ("y", "Y"):
+                                            proceed = False
+                                            paramKey = (conf.hostname, conf.path, None, None)
+                                            kb.testedParams.add(paramKey)
+
+                                if not injectable:
+                                    warnMsg = "%s parameter '%s' does not seem to be " % (paramType, parameter)
                                     warnMsg += "injectable"
                                     logger.warn(warnMsg)
 
@@ -585,24 +608,24 @@ def start():
                     if not conf.string and not conf.notString and not conf.regexp:
                         errMsg += " Also, you can try to rerun by providing "
                         errMsg += "either a valid value for option '--string' "
-                        errMsg += "(or '--regexp')"
+                        errMsg += "(or '--regexp')."
                     elif conf.string:
                         errMsg += " Also, you can try to rerun by providing a "
                         errMsg += "valid value for option '--string' as perhaps the string you "
                         errMsg += "have chosen does not match "
-                        errMsg += "exclusively True responses"
+                        errMsg += "exclusively True responses."
                     elif conf.regexp:
                         errMsg += " Also, you can try to rerun by providing a "
                         errMsg += "valid value for option '--regexp' as perhaps the regular "
                         errMsg += "expression that you have chosen "
-                        errMsg += "does not match exclusively True responses"
+                        errMsg += "does not match exclusively True responses."
 
                     if not conf.tamper:
                         errMsg += " If you suspect that there is some kind of protection mechanism "
                         errMsg += "involved (e.g. WAF) maybe you could retry "
                         errMsg += "with an option '--tamper' (e.g. '--tamper=space2comment')"
 
-                    raise SqlmapNotVulnerableException(errMsg)
+                    raise SqlmapNotVulnerableException(errMsg.rstrip('.'))
             else:
                 # Flush the flag
                 kb.testMode = False
@@ -635,7 +658,7 @@ def start():
                 if not test or test[0] in ("y", "Y"):
                     pass
                 elif test[0] in ("n", "N"):
-                    return False
+                    return injectData
                 elif test[0] in ("q", "Q"):
                     raise SqlmapUserQuitException
             else:
@@ -648,14 +671,16 @@ def start():
             raise
 
         except SqlmapBaseException, ex:
-            errMsg = getUnicode(ex.message)
+            errMsg = getSafeExString(ex)
 
             if conf.multipleTargets:
+                _saveToResultsFile()
+
                 errMsg += ", skipping to the next %s" % ("form" if conf.forms else "URL")
-                logger.error(errMsg)
+                logger.error(errMsg.lstrip(", "))
             else:
                 logger.critical(errMsg)
-                return False
+                return injectData
 
         finally:
             showHttpErrorCodes()
@@ -665,13 +690,13 @@ def start():
                 warnMsg += "has a maximum connections "
                 warnMsg += "constraint"
                 logger.warn(warnMsg)
-
     if kb.dataOutputFlag and not conf.multipleTargets:
         logger.info("fetched data logged to text files under '%s'" % conf.outputPath)
 
-    if conf.multipleTargets and conf.resultsFilename:
-        infoMsg = "you can find results of scanning in multiple targets "
-        infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
-        logger.info(infoMsg)
+    if conf.multipleTargets:
+        if conf.resultsFilename:
+            infoMsg = "you can find results of scanning in multiple targets "
+            infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
+            logger.info(infoMsg)
 
-    return True
+    return injectData

@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-@author: wooyaa
-@file: scan.py
-@time: 2018/1/22 下午8:20
-@license: Apache Licence
-"""
+
 
 import colorama
 from abc import ABCMeta, abstractmethod
@@ -17,8 +12,8 @@ class MeRef(object):
     """
     引用相关
     """
-    url = "相关链接"  # url: http://wooyaa.me/archives/Mysql-Triggers
-    src = "58SRC案例"  # src: 58SRC-201801143
+    url = "相关链接"
+    src = "SRC案例"
 
 
 class VulLevel(object):
@@ -73,6 +68,9 @@ class MePlugin(object):
         super(MePlugin, self).__init__()
         self.log_level = LogLevel.info
         self.flow_data = flow_data
+        self.payloads=[]
+        self.paras=[]
+
 
     @abstractmethod
     def match(self):

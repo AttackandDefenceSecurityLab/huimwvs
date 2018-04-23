@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import locale
 import os
 import re
 import time
@@ -13,6 +14,7 @@ from subprocess import PIPE
 from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import pollProcess
 from lib.core.data import conf
 from lib.core.data import logger
@@ -26,11 +28,10 @@ def update():
         return
 
     success = False
-    rootDir = paths.SQLMAP_ROOT_PATH
 
-    if not os.path.exists(os.path.join(rootDir, ".git")):
+    if not os.path.exists(os.path.join(paths.SQLMAP_ROOT_PATH, ".git")):
         errMsg = "not a git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
-        errMsg += "from GitHub (e.g. git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev)"
+        errMsg += "from GitHub (e.g. 'git clone https://github.com/sqlmapproject/sqlmap.git sqlmap')"
         logger.error(errMsg)
     else:
         infoMsg = "updating sqlmap to the latest development version from the "
@@ -41,17 +42,25 @@ def update():
         logger.debug(debugMsg)
 
         dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
-        process = execute("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE)
-        pollProcess(process, True)
-        stdout, stderr = process.communicate()
-        success = not process.returncode
+
+        try:
+            process = execute("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE, cwd=paths.SQLMAP_ROOT_PATH.encode(locale.getpreferredencoding()))  # Reference: http://blog.stastnarodina.com/honza-en/spot/python-unicodeencodeerror/
+            pollProcess(process, True)
+            stdout, stderr = process.communicate()
+            success = not process.returncode
+        except (IOError, OSError), ex:
+            success = False
+            stderr = getSafeExString(ex)
 
         if success:
-            import lib.core.settings
-            _ = lib.core.settings.REVISION = getRevisionNumber()
-            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", _))
+            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", getRevisionNumber()))
         else:
-            logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", stderr).strip())
+            if "Not a git repository" in stderr:
+                errMsg = "not a valid git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
+                errMsg += "from GitHub (e.g. 'git clone https://github.com/sqlmapproject/sqlmap.git sqlmap')"
+                logger.error(errMsg)
+            else:
+                logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", stderr).strip())
 
     if not success:
         if IS_WIN:

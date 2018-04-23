@@ -39,7 +39,7 @@ class MeScan(MePlugin):
         匹配是否调用此插件
         :return:
         """
-        pass
+        return True
 
     def check(self):
         """

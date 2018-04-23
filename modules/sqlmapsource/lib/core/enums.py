@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -34,6 +34,7 @@ class DBMS:
     SQLITE = "SQLite"
     SYBASE = "Sybase"
     HSQLDB = "HSQLDB"
+    INFORMIX = "Informix"
 
 class DBMS_DIRECTORY_NAME:
     ACCESS = "access"
@@ -47,6 +48,7 @@ class DBMS_DIRECTORY_NAME:
     SQLITE = "sqlite"
     SYBASE = "sybase"
     HSQLDB = "hsqldb"
+    INFORMIX = "informix"
 
 class CUSTOM_LOGGING:
     PAYLOAD = 9
@@ -81,7 +83,7 @@ class HTTPMETHOD:
     POST = "POST"
     HEAD = "HEAD"
     PUT = "PUT"
-    DELETE = "DETELE"
+    DELETE = "DELETE"
     TRACE = "TRACE"
     OPTIONS = "OPTIONS"
     CONNECT = "CONNECT"
@@ -164,8 +166,10 @@ class HTTP_HEADER:
     CONTENT_RANGE = "Content-Range"
     CONTENT_TYPE = "Content-Type"
     COOKIE = "Cookie"
-    SET_COOKIE = "Set-Cookie"
+    EXPIRES = "Expires"
     HOST = "Host"
+    IF_MODIFIED_SINCE = "If-Modified-Since"
+    LAST_MODIFIED = "Last-Modified"
     LOCATION = "Location"
     PRAGMA = "Pragma"
     PROXY_AUTHORIZATION = "Proxy-Authorization"
@@ -173,10 +177,12 @@ class HTTP_HEADER:
     RANGE = "Range"
     REFERER = "Referer"
     SERVER = "Server"
-    USER_AGENT = "User-Agent"
+    SET_COOKIE = "Set-Cookie"
     TRANSFER_ENCODING = "Transfer-Encoding"
     URI = "URI"
+    USER_AGENT = "User-Agent"
     VIA = "Via"
+    X_POWERED_BY = "X-Powered-By"
 
 class EXPECTED:
     BOOL = "bool"
@@ -190,6 +196,8 @@ class OPTION_TYPE:
 
 class HASHDB_KEYS:
     DBMS = "DBMS"
+    DBMS_FORK = "DBMS_FORK"
+    CHECK_WAF_RESULT = "CHECK_WAF_RESULT"
     CONF_TMP_PATH = "CONF_TMP_PATH"
     KB_ABS_FILE_PATHS = "KB_ABS_FILE_PATHS"
     KB_BRUTE_COLUMNS = "KB_BRUTE_COLUMNS"
@@ -197,6 +205,7 @@ class HASHDB_KEYS:
     KB_CHARS = "KB_CHARS"
     KB_DYNAMIC_MARKINGS = "KB_DYNAMIC_MARKINGS"
     KB_INJECTIONS = "KB_INJECTIONS"
+    KB_ERROR_CHUNK_LENGTH = "KB_ERROR_CHUNK_LENGTH"
     KB_XP_CMDSHELL_AVAILABLE = "KB_XP_CMDSHELL_AVAILABLE"
     OS = "OS"
 
@@ -345,3 +354,20 @@ class AUTOCOMPLETE_TYPE:
     SQL = 0
     OS = 1
     SQLMAP = 2
+
+class NOTE:
+    FALSE_POSITIVE_OR_UNEXPLOITABLE = "false positive or unexploitable"
+
+class MKSTEMP_PREFIX:
+    HASHES = "sqlmaphashes-"
+    CRAWLER = "sqlmapcrawler-"
+    IPC = "sqlmapipc-"
+    TESTING = "sqlmaptesting-"
+    RESULTS = "sqlmapresults-"
+    COOKIE_JAR = "sqlmapcookiejar-"
+    BIG_ARRAY = "sqlmapbigarray-"
+
+class TIMEOUT_STATE:
+    NORMAL = 0
+    EXCEPTION = 1
+    TIMEOUT = 2

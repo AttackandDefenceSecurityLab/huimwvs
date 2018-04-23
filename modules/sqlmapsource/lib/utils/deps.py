@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -44,10 +44,12 @@ def checkDependencies():
             elif dbmsName == DBMS.HSQLDB:
                 import jaydebeapi
                 import jpype
+            elif dbmsName == DBMS.INFORMIX:
+                import ibm_db_dbi
         except ImportError:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "
-            warnMsg += "%s. Download from %s" % (dbmsName, data[2])
+            warnMsg += "'%s'. Download from %s" % (dbmsName, data[2])
             logger.warn(warnMsg)
             missing_libraries.add(data[1])
 
