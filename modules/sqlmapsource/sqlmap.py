@@ -141,7 +141,7 @@ def main(url):
         conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
-
+        #print conf.verbose
         init()
 
         if conf.profile:

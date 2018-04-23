@@ -730,6 +730,7 @@ def checkSqlInjection(place, parameter, value):
                     choice = readInput(msg, default=str(conf.verbose), checkBatch=False).strip()
                 conf.verbose = int(choice)
                 setVerbosity()
+                print "456"
                 tests.insert(0, test)
             elif choice[0] in ("n", "N"):
                 return None

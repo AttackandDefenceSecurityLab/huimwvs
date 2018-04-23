@@ -171,6 +171,7 @@ def liveTest():
                 parse.append((value, parse_from_console_output))
 
         conf.verbose = global_.get("verbose", 1)
+        print "123"
         setVerbosity()
 
         msg = "running live test case: %s (%d/%d)" % (name, count, length)

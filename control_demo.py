@@ -10,9 +10,9 @@ import time
 r=redis.Redis(host='127.0.0.1',port=6379,db=0)
 #while True:
 datas=r.lrange('data',-7,-7)
-print datas
+#print datas
 for data in datas:
-    print data
+    #print data
     if data:
         jsonData=json.loads(data)
         exist=main(SqliScan(jsonData)) #传入的字典需要由插件判断是否存在某key，如cookie可能不存在，在进行 data['coookie']提取时会报错

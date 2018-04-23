@@ -12,7 +12,6 @@ def main(me_instance):
     parser.add_argument('--debug', required=False, action="store_true", help="显示测试信息")
 
     args = vars(parser.parse_known_args()[0])
-    print args
     if args['debug']:
         me_instance.log_level = LogLevel.debug
     """

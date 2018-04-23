@@ -41,4 +41,5 @@ FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H
 
 LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
+#print logging.INFO
 LOGGER.setLevel(logging.INFO)
