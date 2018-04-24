@@ -32,8 +32,10 @@ def main(me_instance):
 
             if me_instance.paras:
                 print('[参数]')
+                print('\t'),
                 for para in me_instance.paras:
-                    print(('\t{p_para}').format(p_para=para))
+                    print(('{p_para} ').format(p_para=para)),
+                print('')
 
             print('[详细说明]')
             print('\t{p_desc}'.format(p_desc=me_instance.plugin_info.get('desc', '').strip()))

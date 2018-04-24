@@ -4,7 +4,7 @@
 import simplejson as json
 
 flow_data = {
-    "url": 'http//www.baidu.com',
+    "url": 'http://www.baidu.com?a=1',
     "method": "GET",
     "domain": "baidu.com",
     "post_data": "requset_data",

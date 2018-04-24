@@ -552,7 +552,7 @@ def start():
 
                                         msg = "%s parameter '%s' " % (injection.place, injection.parameter)
                                         msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
-                                        test = readInput(msg, default="N")
+                                        test = readInput(msg, default="y")
 
                                         if test[0] not in ("y", "Y"):
                                             proceed = False

@@ -19,7 +19,7 @@ class SqliScan(MePlugin):
             self.target=urlparse.urlunsplit((arr.scheme, arr.netloc, arr.path, '', ''))
         self.plugin_info = {
             "name": "sql注入检测插件",  # 插件的名称
-            "product": "通用URL以及参数",  # 该插件所针对的应用名称,严格按照文档上的进行填写
+            "product": "带参数的URL",  # 该插件所针对的应用名称,严格按照文档上的进行填写
             "product_version": "*",  # 应用的版本号,严格按照文档上的进行填写
             "desc": """
             调用sqlmap对url、参数、cookie及Header等进行sql注入检测
@@ -68,11 +68,11 @@ class SqliScan(MePlugin):
         ua_string=self.flow_data.get('User-Agent',"")
 
         request_data=self.flow_data.get('request_data',"")
-        print request_data
+        #print request_data
         if cookie:
-            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--cookie',cookie,'--user-agent',ua_string]
+            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--cookie',cookie,'--user-agent',ua_string,'--flush-session']
         else:
-            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--user-agent',ua_string]
+            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--user-agent',ua_string,'--flush-session']
         if request_data:
             data.append('--data')
             data.append(request_data)

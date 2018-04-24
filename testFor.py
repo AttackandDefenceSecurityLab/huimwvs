@@ -1,8 +1,13 @@
-str="Parameter: id (GET)\n    Type: boolean-based blind\n    Title: AND boolean-based blind - WHERE or HAVING clause\nParameter: id (GET)\n    Type: boolean-based blind\n    Title: AND boolean-based blind - WHERE or HAVING clause\n"
-raws = str.split("\n")
-
-for row in raws:
-    #print para
-    if "Parameter:" in row:
-        para = row.split(": ")[1]
-        print para
+import requests
+import urllib
+para={'a':'1','b':'2','c':'3'}
+def changePara(para):
+    qs=""
+    for key in para:
+        val = para[key]
+        if qs:
+            qs += "&" + urllib.quote(key) + "=" + urllib.quote(val)
+        else:
+            qs += urllib.quote(key) + "=" + urllib.quote(val)
+    return qs
+print changePara(para)
