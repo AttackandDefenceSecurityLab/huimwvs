@@ -63,16 +63,33 @@ class SqliScan(MePlugin):
 
         #url, premethod, cookie, prerequest_data, preUser_Agent, preip, prerefer = head_info_get(data, flag)
         url=self.flow_data['url']
+        newparas=self.flow_data['newparas'].split('&')
         method=self.flow_data['method']
         cookie=self.flow_data.get('cookie',"")
         ua_string=self.flow_data.get('User-Agent',"")
-
         request_data=self.flow_data.get('request_data',"")
-        #print request_data
+        #print url
+        '''
+        标记新参数，即需要检测的参数
+        GET参数：对url ?X=  &X=特征的参数加*
+        POST参数：符合的参数加*
+        URI 与 POST 用来存放 sqlmap 结果"#1* (URI)"类对应的参数，在后面转换
+        '''
+        URI=[]
+        POST=[]
+        for newpara in newparas:
+            if newpara in url:
+                url=url.replace('?'+newpara+'=','?'+newpara+'=*')
+                url=url.replace('&'+newpara+'=','&'+newpara+'=*')
+                URI.append(newpara)
+            if newpara in request_data:
+                request_data=request_data.replace(newpara+'=',newpara+'=*')
+                POST.append(newpara)
+        #print url
         if cookie:
-            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--cookie',cookie,'--user-agent',ua_string,'--flush-session']
+            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--cookie',cookie,'--user-agent',ua_string]
         else:
-            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--user-agent',ua_string,'--flush-session']
+            data=['sqlmap.py','-u',url,'--batch','--level=1','--dbms=mysql','--user-agent',ua_string]
         if request_data:
             data.append('--data')
             data.append(request_data)
@@ -84,16 +101,21 @@ class SqliScan(MePlugin):
 
 
         if injection and str(injection.get('data','not found')).find("Payload")!=-1:
-            #Parameters=
-
-
             rows=str(injection.get('data','not found')).split("\n")
             for row in rows:
                 if "Payload" in row:
                     payload=row.split(": ")[1]
                     self.payloads.append(payload)
                 if "Parameter:" in row:
-                    para = row.split(": ")[1]
+                    prepara = row.split(": ")[1]
+                    #prepare如 "#1* (URI)"
+                    if "URI" in prepara:
+                        # prepare由此截取出一个数字
+                        prepara=prepara.split("#")[1].split("*")[0]
+                        para = URI[int(prepara)-1] + "(GET)"
+                    elif "POST" in prepara:
+                        prepara=prepara.split("#")[1].split("*")[0]
+                        para = POST[int(prepara)-1] + "(POST)"
                     self.paras.append(para)
 
             return True

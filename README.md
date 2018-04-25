@@ -4,7 +4,8 @@
 - MHH 扫描结果存入数据库
     - MHH 数据库连接池
     - MHH 扫描器引擎调整
-- H xss插件
+- M xss插件
+    - 存储型与DOM XSS检测
 - MMH hash collision插件
 - M csrf插件添加ajax检测
 - MH 敏感文件扫描插件

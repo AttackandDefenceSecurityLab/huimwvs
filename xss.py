@@ -120,9 +120,13 @@ class XssScan(MePlugin):
         target=self.target
         premethod=self.flow_data['method']
         headers = self.flow_data['head']
+        newparas=self.flow_data['newparas'].split('&')
         if premethod.upper() == 'GET':
             inj = "huimxssprescan"
             for key in self.getparas:
+                #如果参数不是新出现的，为之前检测过的，那么continue不检测。只检测新出现的参数
+                if key not in newparas:
+                    continue
                 #把参数复制新一份，再一个一个尝试添加
                 getparas=self.getparas.copy()
                 getparas[key] += inj
