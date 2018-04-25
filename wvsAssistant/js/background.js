@@ -49,7 +49,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){ //只有onBefor
         if (details.url != apihostActiveinfo && details.url != apihostUserinfo) {
             id = details.requestId;
             requestbody[id] = details;
-            console.log('POST  '+id + '  '+details['url']);
+            //console.log('POST  '+id + '  '+details['url']);
             //console.log(details);
 
         }
@@ -68,7 +68,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
     if(Number(captured) != 0  && captureUrl(details.url,details.method) != 0) {
         request.push(details);
         //console.log(details);
-        console.log("HEADER  "+details['requestId'] + '  '+details['url']);
+        //console.log("HEADER  "+details['requestId'] + '  '+details['url']);
     }
 }, filter, ["requestHeaders"]);
 
@@ -84,14 +84,14 @@ chrome.webRequest.onSendHeaders.addListener(function(details){
     captured=1;
     //console.log('request_id: '+request_id);
     //console.log("go");
-    console.log("LAST ALL  "+details['requestId'] + '  '+details['url']);
+    //console.log("LAST ALL  "+details['requestId'] + '  '+details['url']);
     if(Number(captured) != 0  && captureUrl(details.url,details.method) != 0) {
         var currentreq = request[request_id];
         var requestHeaderLen = currentreq.requestHeaders.length;
         //console.log("request中提取的currentreq.url  " + currentreq.url);
         var reqid = currentreq.requestId;
         //console.log(requestbody[reqid].requestBody);
-        if (currentreq.url != apihost && currentreq.url != apihostActiveinfo && currentreq.url != apihostUserinfo) {
+        if (currentreq.url != apihost && currentreq.url.indexOf('127.0.0.1/test.php')<1  && currentreq.url != apihostActiveinfo && currentreq.url != apihostUserinfo) {
             //console.log("2");
             //console.log("DONE CHECK "+'  '+ currentreq.requestId + '  ' + currentreq.url);
             var reqdic = {};
