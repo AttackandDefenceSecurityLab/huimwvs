@@ -45,39 +45,55 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){ //只有onBefor
         var a=1;
     }
     if (Number(captured) != 0 && captureUrl(details.url,details.method) != 0) {
-        if (details.url != apihost && details.url != apihostActiveinfo && details.url != apihostUserinfo) {
+        //if (details.url != apihost && details.url != apihostActiveinfo && details.url != apihostUserinfo) {
+        if (details.url != apihostActiveinfo && details.url != apihostUserinfo) {
             id = details.requestId;
             requestbody[id] = details;
+            console.log('POST  '+id + '  '+details['url']);
+            //console.log(details);
+
         }
     }
 }, filter, ["blocking", "requestBody"]);
 
+//chrome.webRequest.onBeforeSendHeaders.addListener(function(details{
+
+//}))
+
 //Body与Headers分别于上下两个监听中获取，只能保存两次，并互相取用了。
 //获取请求的部分信息，特别含有requestHeaders
-chrome.webRequest.onSendHeaders.addListener(function(details){
+//chrome.webRequest.onSendHeaders.addListener(function(details){
+chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
     captured=1;
     if(Number(captured) != 0  && captureUrl(details.url,details.method) != 0) {
         request.push(details);
         //console.log(details);
+        console.log("HEADER  "+details['requestId'] + '  '+details['url']);
     }
 }, filter, ["requestHeaders"]);
 
+//流量拦截器
+//chrome.webRequest.onBeforeRequest.addListener(
+//        function(details) { return {cancel: true}; },
+//        {urls: ["*://www.baidu.com/*"]},
+//        ["blocking"]);
+
 //综合需要的请求数据，发送到服务器
-chrome.webRequest.onHeadersReceived.addListener(function(details){
+//chrome.webRequest.onHeadersReceived.addListener(function(details){
+chrome.webRequest.onSendHeaders.addListener(function(details){
     captured=1;
+    //console.log('request_id: '+request_id);
     //console.log("go");
-    if(Number(captured) != 0){
-        //console.log("OK-1");
-    }
-    if(captureUrl(details.url,details.method) != 0){
-        //console.log("OK-2");
-    }
+    console.log("LAST ALL  "+details['requestId'] + '  '+details['url']);
     if(Number(captured) != 0  && captureUrl(details.url,details.method) != 0) {
-        //console.log("1");
         var currentreq = request[request_id];
         var requestHeaderLen = currentreq.requestHeaders.length;
+        //console.log("request中提取的currentreq.url  " + currentreq.url);
+        var reqid = currentreq.requestId;
+        //console.log(requestbody[reqid].requestBody);
         if (currentreq.url != apihost && currentreq.url != apihostActiveinfo && currentreq.url != apihostUserinfo) {
             //console.log("2");
+            //console.log("DONE CHECK "+'  '+ currentreq.requestId + '  ' + currentreq.url);
             var reqdic = {};
             for (var i = 0; i < requestHeaderLen; i++) {
                 var reqFieldName = currentreq.requestHeaders[i].name;
@@ -101,7 +117,12 @@ chrome.webRequest.onHeadersReceived.addListener(function(details){
                 //console.log("4");
                 var reqdata = new Array();
                 var reqid = currentreq.requestId;
+                //console.log("LAST POST  "+reqid+'  '+currentreq.url);
+                //console.log(requestbody[reqid].requestBody.formData);
                 try {
+                    // console.log(requestbody[reqid].requestBody.formData);
+                    // 此处可能报错，出发报错机制：某些POST请求中没有数据，将导致传入None类型给each函数。
+                    // 此处也杜绝了将无POST数据的POST请求发送给服务器去检测
                     $.each(requestbody[reqid].requestBody.formData, function (name, value) {
                         reqdata.push(name + '=' + value); //将POST参数以 a=b的形式一个个存入数组
                     });
@@ -150,4 +171,4 @@ chrome.webRequest.onHeadersReceived.addListener(function(details){
         }
         request_id += 1;
     }
-}, filter, ["blocking", "responseHeaders"]);
+}, filter, ["requestHeaders"]);
