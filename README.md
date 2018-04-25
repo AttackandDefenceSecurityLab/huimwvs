@@ -1,4 +1,7 @@
 # huimwvs
+/webserver/ ： php服务器端接收wvsAssistant数据并存入redis的程序。
+额外需要环境：phpredis
+
 待进行
 - L sqlmap优化
 - MHH 扫描结果存入数据库
