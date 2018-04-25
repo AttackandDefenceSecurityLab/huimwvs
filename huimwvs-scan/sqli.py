@@ -3,7 +3,7 @@
 from modules.scan import MePlugin
 import time
 import sys
-sys.path.append('F:\\\xb9\xa4\xbe\xdf\\huimwvs\\modules\\sqlmapsource')
+sys.path.append(sys.path[0]+'\\modules\\sqlmapsource')
 import sqlmap
 import urlparse
 import chardet
