@@ -2153,7 +2153,7 @@ def setVerbosity():
     """
     This function set the verbosity of sqlmap output messages.
     """
-    #conf.verbose = 0
+    conf.verbose = 0
     if conf.verbose is None:
         conf.verbose = 1
 

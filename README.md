@@ -3,6 +3,11 @@
 - php服务器端接收wvsAssistant数据并存入redis的程序。
 - 额外需要环境：phpredis
 
+数据库环境
+- [DBUtils] pip install DBUtils
+- MySQLdb
+
+
 待进行
 - L sqlmap优化
 - MHH 扫描结果存入数据库

@@ -6,6 +6,7 @@ import sys
 sys.path.append('F:\\\xb9\xa4\xbe\xdf\\huimwvs\\modules\\sqlmapsource')
 import sqlmap
 import urlparse
+import chardet
 
 class SqliScan(MePlugin):
     """
@@ -24,7 +25,7 @@ class SqliScan(MePlugin):
             "desc": """
             调用sqlmap对url、参数、cookie及Header等进行sql注入检测
             """,  # 插件的描述
-            "author": ["huim"],  # 插件作者
+            "author": "[huim]",  # 插件作者
             "ref": [
                 {self.ref.url: "https://www.owasp.org/index.php/SQL_Injection"},  # 引用的url
                 {self.ref.src: "http://www.anquan.us/static/bugs/wooyun-2016-0219921.html"},  # src上的案例
@@ -34,6 +35,8 @@ class SqliScan(MePlugin):
             "privileged": False,  # 是否需要登录
             "target": self.target  #漏洞目标
         }
+        #print type(self.plugin_info['author'])
+        #print chardet.detect(self.plugin_info.get('target',""))
     def match(self):
         """
         匹配是否调用此插件
@@ -63,6 +66,7 @@ class SqliScan(MePlugin):
 
         #url, premethod, cookie, prerequest_data, preUser_Agent, preip, prerefer = head_info_get(data, flag)
         url=self.flow_data['url']
+        #print chardet.detect(url)
         newparas=self.flow_data['newparas'].split('&')
         method=self.flow_data['method']
         cookie=self.flow_data.get('cookie',"")
@@ -113,6 +117,7 @@ class SqliScan(MePlugin):
                         # prepare由此截取出一个数字
                         prepara=prepara.split("#")[1].split("*")[0]
                         para = URI[int(prepara)-1] + "(GET)"
+                        #print chardet.detect(URI[int(prepara)-1])
                     elif "POST" in prepara:
                         prepara=prepara.split("#")[1].split("*")[0]
                         para = POST[int(prepara)-1] + "(POST)"

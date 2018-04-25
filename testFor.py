@@ -1,3 +1,2 @@
-a='a&b&c'
-b=a.split('&')
-print 'ab' in b
+a="123456"
+print a[:-1]
