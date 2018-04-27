@@ -1,0 +1,101 @@
+@charset "utf-8";
+/* CSS Document */
+/*common*/
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, legend, button, input, textarea, th, td { margin:0; padding:0; }
+body, button, input, select, textarea{ font:12px/1.5 "Microsoft YaHei", "Arial", "宋体";color:#122347}
+ul, ol{ list-style:none; }
+img {border:0;}
+.clear:after { content:'\20'; display:block; height:0; clear:both; }
+.clear { *zoom:1;}
+a{text-decoration: none;}
+a:link { font-size: 12px; color: #1b609a; text-decoration:none; }
+a:visited { font-size: 12px; color: #123f65; text-decoration:none; }
+a:hover { font-size: 12px; text-decoration: none; color:#0088cc; }
+.hide{display:none} .show{display:}/*隐藏 显示*/
+.color_red{ color:#F00!important}.color_gray{ color:#939393!important}/*字体颜色*/
+.bg_red{ background-color:#FFBFB8!important;}/*背景颜色*/
+.align_left{ text-align:left;}.align_center{ text-align:center;}.align_right{ text-align:right;}
+/*layout*/
+.wrapper{overflow: hidden;}
+.wrapper_w800{
+    margin: 0px auto;
+    overflow: hidden;
+    width: 900px;}
+.report_tip{background:#398FF7 url(images/top_title.png) 15px center no-repeat;height:38px; margin-top:1px;}
+.report_tip.no_logo{background:#398FF7;}
+/*content*/
+.report_h1,.report_h2,.report_h3,.report_h4{position:relative;font-weight:bold}
+.report_h1{font-size:15px;border:solid 1px #e6e6e6;padding-left:10px;line-height:34px;height:34px;background-color:#f8f8f8;text-align:left; margin-top:1px; cursor:pointer;}
+.report_h2,.report_h3,.report_h4{padding-bottom:5px;}
+.report_h2{font-size:14px; cursor:pointer;}
+.report_h3,.report_h4{font-weight:500;font-size:14px; padding:2px 0 0 10px;}
+.report_h4{font-size:12px;}
+.report_h img{vertical-align:middle}
+.report_content{padding:10px; border:#E6E6E6 solid 1px; border-top:0; background:#FFF;}
+.block{margin-bottom:30px;}
+.report_content p{text-indent:2em; line-height:150%;margin-bottom:15px;}
+en_US.report_content p{line-height:150%;margin-bottom:15px;}
+
+a.h1_dot{position:absolute;display:block;width:16px;height:16px;background:url(images/down.gif) center center no-repeat;right:10px;top:8px; cursor:pointer;}
+a.h1_dot.up{background-image:url(images/up.gif);}
+a.h1_dot:hover{opacity:0.5;filter:alpha(opacity=50);}
+
+a.h2_dot{display:inline-block;width:16px;height:16px;background:url(images/down2.png) center 8px no-repeat;cursor:pointer; margin-left:8px;}
+a.h2_dot.up{background-image:url(images/up2.png);}
+a.h2_dot:hover{opacity:0.5;filter:alpha(opacity=50);}
+
+
+.report_title{padding:20px 0 0 0;}
+.report_title h1{font-size:22px;height:30px;line-height:30px;text-align:center}
+.report_title span.note{display:block;text-align:right;padding-right:10px;}
+#catalog_tree,#catalog_tree li{text-align:left;line-height:22px;}#catalog_tree li a img{ vertical-align:middle}
+#catalog_tree li ul{padding-left:16px;}
+#catalog_tree a.dot{display:inline-block;width:16px;height:16px;background:url(images/blank.gif) center center no-repeat; vertical-align:middle; cursor:pointer;text-decoration: none;}
+#catalog_tree a.dot:hover{opacity:0.5;filter:alpha(opacity=50);}
+#catalog_tree a.up{ background-image:url(images/tree_open.gif)}
+#catalog_tree a.down{ background-image:url(images/tree_closed.gif)}
+div.img{padding:5px;text-align:center}/*images */
+
+table.report_table thead tr{border-bottom:solid 1px #ddd;}
+table.report_table{border:solid 1px #ddd; border-collapse:collapse; width:100%;margin:5px 0;}
+table.report_table th,table.report_table td{border-left:solid 1px #ddd;padding:0 8px;height:24px; line-height:24px;text-align:left; vertical-align:top;}
+table.report_table th.center,table.report_table td.center{text-align:center}/*居中对齐*/
+table.report_table th{font-weight:600}
+table.report_table tr.first_title { background:#fff;}
+table.report_table tr.second_title { background:#fff; }
+table.report_table tr.second_title td,table.report_table tr.first_title td,table.report_table tr.second_title th { border:1px solid #ddd; border-bottom:1px solid #ddd;font-weight:600; vertical-align:middle;}
+table.report_table tr.first_title td{font-weight:600;}
+table.report_table tbody tr.odd { background:#FFFFFF; }
+table.report_table tbody tr.even { background:#F2F2F2; }
+table.report_table .w16 { width:16px; vertical-align:middle; white-space:nowrap; word-wrap:keep-all; word-break:keep-all;text-align:center }
+table.report_table tfoot tr th{border-top:solid 1px #ddd; font-weight:bold;}
+table.report_table.plumb{ border:1px solid #ddd;}
+table.report_table.plumb th {background-color: #fff;border:1px solid #ddd;font-weight: bold;color: #414141;}
+table.report_table tr.more{ border:solid 1px #DDDDDD;}
+.report_note{ font-size:11px}
+.report_warning{margin:10px 0;color:#F00}
+.report_warning b{font-size:14px;}
+
+.ico { background:url(images/blank.gif) no-repeat 0 0; width:16px; height:16px; margin-right:4px; }
+.ico.plus { background-image:url(images/plus.gif); width:9px; height:9px; cursor:pointer; }
+.ico.minus { background-image:url(images/minus.gif); width:9px; height:9px; cursor:pointer; }
+
+table.report_table .td_tab { padding:3px; border:solid 1px #ddd; }
+.tab_head { border-bottom:1px solid #ddd; line-height:1.231; zoom:1; clear:both; padding:0; margin:0; list-style-type:none; list-style:none }
+.tab_head:after { content:" "; display:block; clear:both; visibility:hidden; height:0; overflow:hidden; }
+.tab_head li { padding:3px 10px; float:left; display:inline; position:relative; height:26px;line-height:26px; top:1px; list-style-type:none; list-style:none; }
+.tab_head li a{color:#69A4EB;}
+.tab_head li.selected { background-color:#FFF; border:solid 1px #ddd; border-bottom:solid 1px #fff; border-radius: 4px 4px 0 0;}
+.tab_head li.selected a { color:#808080!important; cursor:default }
+.tab_content { padding:8px 10px; }
+/*gotop*/
+.gotop{display:block;position:fixed;_position:absolute;width:40px;height:40px; background:url(images/gotop.png) 0 0 no-repeat;right:12px; bottom:50px;}
+/* Dialog */
+.fixed_top{ position:fixed; top:0; z-index:1; _position:absolute;_top:expression(eval(document.documentElement.scrollTop)); }
+
+/*内嵌表格样式*/
+table.report_table tr.more tr.even td{background:#eaeaea;}
+
+/* html td 自动换行*/
+table.report_table th,table.report_table td{table-layout:fixed;word-break:break-all;word-wrap:break-all;}
+

@@ -23,7 +23,7 @@ def byteify(input):
 #pool = PooledDB(MySQLdb,maxconnections=10000,host='localhost',user='root',passwd='root',db='huimwvs',port=3306) #5为连接池里的最少连接数
 class MySQLPool():
     def __init__(self):
-        self.pool = PooledDB(MySQLdb,maxconnections=10000,host='localhost',user='root',passwd='root',db='huimwvs',port=3306) #5为连接池里的最少连接数
+        self.pool = PooledDB(MySQLdb,maxconnections=10000,host='localhost',user='root',passwd='root',db='huimwvs',port=3306,charset="utf8") #5为连接池里的最少连接数
 
     def insert(self,table,sqldata):
         sql="INSERT INTO "+table+" "
@@ -33,6 +33,7 @@ class MySQLPool():
             keys += key+","
             values += "\"" + sqldata[key] + "\","
         sql += "(" + keys[:-1] + ") VALUES (" + values[:-1] + ")"
+        #print sql
 
         try:
             conn = self.pool.connection()  #以后每次需要数据库连接就是用connection（）函数获取连接就好了
@@ -48,3 +49,4 @@ class MySQLPool():
             print err
 
 pool=MySQLPool()
+rawpool=PooledDB(MySQLdb,maxconnections=10000,host='localhost',user='root',passwd='root',db='huimwvs',port=3306,charset="utf8") #5为连接池里的最少连接数

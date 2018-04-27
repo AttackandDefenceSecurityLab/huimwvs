@@ -82,9 +82,9 @@ def main(me_instance):
                 pocvalue =""
                 print('[漏洞POC]')
                 for payload in me_instance.payloads:
-                    pocvalue += "<" + payload + ">"
+                    pocvalue += payload +"[cut-off]"
                     print(('\t{p_poc}').format(p_poc=payload))
-                sql["payload"]=pocvalue
+                sql["payload"]=pocvalue[:-9]
                 #sqlvalue += "\","
 
             print('[相关引用]')
@@ -96,8 +96,8 @@ def main(me_instance):
                         return
                     ref_key = each_ref.keys()[0]
                     print('\t* {ref_key}: {ref_value}'.format(ref_key=ref_key, ref_value=each_ref.get(ref_key).strip()))
-                    refvalue += "<"+ref_key + ":" + each_ref.get(ref_key).strip()+">"
-                sql["ref"]=refvalue
+                    refvalue += ref_key + ":" + each_ref.get(ref_key).strip()+"[cut-off]"
+                sql["ref"]=refvalue[:-9]
                 #sqlvalue += "\""
             #sql = "INSERT INTO vul ({keys}) VALUES ({vaules})".format(keys=sqlkey,vaules=sqlvalue)
             #print sql

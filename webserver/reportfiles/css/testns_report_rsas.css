@@ -1,0 +1,28 @@
+@charset "utf-8";
+/*危险等级*/
+.level_danger{font-size:16px; font-weight:bold; margin-left:4px;}
+.level_danger.high{color:#d30101;}
+.level_danger.middle{color:#d53e00;}
+.level_danger.low{color:#2c5eae;}
+.level_danger.safe{color:#288603;}
+
+.level_danger_high{color:#e42b00;}
+.level_danger_middle{color:#af6100;}
+.level_danger_low{color:#737373;}
+
+.detail{ border:#c2c2c2 dashed 1px; padding:8px; margin:3px 0; line-height:20px; display:none;}
+
+table.solution{ display:none;}
+table.solution td{ border:0; vertical-align:top; line-height:20px; padding-top:8px;}
+table.report_table td.right{ text-align:right;}
+table.inner_table{ margin-left:14px;}
+
+
+/*综述报表*/
+.center{ text-align:center;}
+.font_high{ color:#e42b00;}
+.font_middle{ color:#ff821d;}
+.font_low{ color:#eaba1e;}
+.font_safe{ color:#98c94b;}
+.font_total{ color:#1b609a;}
+.font_bold{ font-weight:bold; font-size:14px;}

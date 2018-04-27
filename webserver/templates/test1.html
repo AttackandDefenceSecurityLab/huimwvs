@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>huimwvs报表</title>
+<link rel="stylesheet" href="reportfiles/css/ns_report.css" />
+<link rel="stylesheet" href="reportfiles/css/ns_report_rsas.css" />
+<link rel="stylesheet" href="reportfiles/js/datepicker/skin/WdatePicker.css" />
+<script src="reportfiles/js/jquery.js"></script>
+<script src="reportfiles/js/common.js"></script>
+<script src="reportfiles/js/datepicker/WdatePicker.js"></script>
+</head>
+<body>
+<div id="report" class="wrapper_w800">
+  <div  id="head"  class="report_title">
+    <h1>huimwvs报表</h1>
+    <span class="note">&nbsp;</span> </div>
+  <!--head end,catalog start-->
+
+
+  <div>
+    <table id="vuln_distribution" class="report_table">
+    <thead>
+    <tr class="second_title">
+        <th style='width:40px'>序号</th>
+        <th >目标</th>
+        <th style='width:150px'>漏洞类型</th>
+
+    </tr>
+    </thead>
+    <tbody>
+
+
+
+{for $num=0 to $datacount-1}    
+    <tr class="odd vuln_high" style="cursor:pointer;" onclick="no_toggle('4_1_{$num+1}','table_4_1_{$num+1}')">
+        <td>{$num+1}</td>
+        <td>
+        <img id="4_1_1" class="ico plus" src="reportfiles/images/blank.gif">
+        <img align='absmiddle' src='reportfiles/images/vuln_high.gif' ></img>
+        <span style='color:#E42B00'>{$rows[$num]['target']}</span>
+        </td>
+        <td>{$rows[$num]['vultype']}</td>
+    </tr>
+    <tr class="more hide odd" id="table_4_1_{$num+1}">
+        <th></th>
+        <td style="padding-left:20px" class="extend" colspan='2'>
+            <table style="white-space:pre-wrap;" class="report_table" width="100%">
+				{$ident=0}
+				
+				{if isset($rows[$num]['plugin_author'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th width="15%">[插件作者]</th>
+					<td width="85%">{$rows[$num]['plugin_author']}</td>
+				</tr>
+				{/if}
+				
+				{if isset($rows[$num]['target']) || isset($rows[$num]['vultype'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th>[风险]</th>
+					<td>目标 {$rows[$num]['target']}  存在 {$rows[$num]['vultype']} </td>
+				</tr>
+				{/if}
+				
+				{if isset($rows[$num]['para'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th>[参数]</th>
+					<td>{$rows[$num]['para']}</td>
+				</tr>
+				{/if}
+				
+				{if isset($rows[$num]['descrip'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th>[详细说明]</th>
+					<td>{$rows[$num]['descrip']}</td>
+				</tr>
+				{/if}
+				
+				{if isset($rows[$num]['severity'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th>[危害等级]</th>
+					<td>{$rows[$num]['severity']}</td>
+				</tr>
+				{/if}
+				
+				{if isset($rows[$num]['vultype'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th>[漏洞类型]</th>
+					<td>{$rows[$num]['vultype']}</td>
+				</tr>
+				{/if}
+				
+				{if isset($rows[$num]['payload'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th>[漏洞POC]</th>
+					<td>{$rows[$num]['payload']}</td>
+				</tr>
+				{/if}
+				
+				{if isset($rows[$num]['ref'])}
+				<tr class="{$ident_arr[$ident]}{$ident=($ident+1)%2}">
+					<th>[相关引用]</th>
+					<td>{$rows[$num]['ref']}</td>
+				</tr>
+				{/if}
+				
+    
+            </table>
+        </td>
+	</tr>
+	{/for}
+	</tbody>
+	<tfoot>
+    </tfoot>
+    </table>
+  </div></div></div>
+  </div>
+</div>
+<!--content end-->
+</div>
+</body>
+</html>
