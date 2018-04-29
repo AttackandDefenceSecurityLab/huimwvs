@@ -72,12 +72,18 @@ class CsrfScan(MePlugin):
 
 
                 headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
-                q=requests.get(url,headers=headers,cookies=cookie)
-                rep=q.content
+                try:
+                    q=requests.get(url,headers=headers,cookies=cookie)
+                    rep=q.content
+                except:
+                    return []
                 #print rep
 
-                q_nocookie=requests.get(url,headers=headers)
-                rep_nocookie=q_nocookie.content
+                try:
+                    q_nocookie=requests.get(url,headers=headers)
+                    rep_nocookie=q_nocookie.content
+                except:
+                    return []
 
                 forms=re.findall("<form[\s\S]*?</form>",rep)
 
@@ -98,8 +104,11 @@ class CsrfScan(MePlugin):
                 所以排除掉。
                 后续如果发现其他引起form变化的非token因素，修改此过滤条件。
                 '''
-                q_recheckToken=requests.get(url,headers=headers,cookies=cookie)
-                rep_recheckToekn=q_recheckToken.content
+                try:
+                    q_recheckToken=requests.get(url,headers=headers,cookies=cookie)
+                    rep_recheckToekn=q_recheckToken.content
+                except:
+                    return []
 
                 for form in forms:
                     if form not in rep_recheckToekn:

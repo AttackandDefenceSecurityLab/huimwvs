@@ -130,13 +130,16 @@ class XssScan(MePlugin):
                 #把参数复制新一份，再一个一个尝试添加
                 getparas=self.getparas.copy()
                 getparas[key] += inj
-                rep=requests.get(target,params=getparas,headers=headers)
-                reptext=rep.text
-                if "huimxssprescan" in reptext:
-                    #		print scanurl
-                    #print "-->prescan ok"
-                    #print rep.url
-                    vulurllist.append(key)
+                try:
+                    rep=requests.get(target,params=getparas,headers=headers)
+                    reptext=rep.text
+                    if "huimxssprescan" in reptext:
+                        #		print scanurl
+                        #print "-->prescan ok"
+                        #print rep.url
+                        vulurllist.append(key)
+                except:
+                    return None
         else:
             return None
 

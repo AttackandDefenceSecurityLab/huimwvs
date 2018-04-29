@@ -11,6 +11,20 @@ var apihost = 'http://203.195.164.69/test.php';
 //var apihostScanresult = '127.0.0.1/?id=1';
 //var apihost = 'http://127.0.0.1/test.php';
 
+//启动浏览器时判断插件是否被激活，设置图标
+if(localStorage.captureStatus == undefined){
+    captured = 1;
+}else{
+    captured = localStorage.captureStatus;
+}
+
+if(captured == 1){
+    setIconInfo();
+}
+else{
+    setInactiveIconInfo();
+}
+
 
 var filter = {
     urls: ["<all_urls>"],
@@ -44,8 +58,12 @@ function captureUrl(reqUrl, method) { //过滤出带参数的请求，去除图�
 }
 //获取post的请求数据，特别含有（POST请求）requestBody部分
 chrome.webRequest.onBeforeRequest.addListener(function(details){ //只有onBeforeRequest阶段的details，存在POST数据(requestBody)，在其后该字段会变为requestHeaders
-    captured=1;
-    if(captureUrl(details.url,details.method) != 0){
+    if(captured == undefined){
+        captured = 1;
+    }else{
+        captured = localStorage.captureStatus;
+    }
+    if(Number(captured) != 0  && captureUrl(details.url,details.method) != 0){
         var a=1;
     }
     if (Number(captured) != 0 && captureUrl(details.url,details.method) != 0) {
@@ -68,7 +86,11 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){ //只有onBefor
 //获取请求的部分信息，特别含有requestHeaders
 //chrome.webRequest.onSendHeaders.addListener(function(details){
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
-    captured=1;
+    if(captured == undefined){
+        captured = 1;
+    }else{
+        captured = localStorage.captureStatus;
+    }
     if(Number(captured) != 0  && captureUrl(details.url,details.method) != 0) {
         request.push(details);
         //console.log(details);
@@ -85,7 +107,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
 //综合需要的请求数据，发送到服务器
 //chrome.webRequest.onHeadersReceived.addListener(function(details){
 chrome.webRequest.onSendHeaders.addListener(function(details){
-    captured=1;
+    if(captured == undefined){
+        captured = 1;
+    }else{
+        captured = localStorage.captureStatus;
+    }
     //console.log('request_id: '+request_id);
     //console.log("go");
     //console.log("LAST ALL  "+details['requestId'] + '  '+details['url']);
@@ -179,3 +205,18 @@ chrome.webRequest.onSendHeaders.addListener(function(details){
         request_id += 1;
     }
 }, filter, ["requestHeaders"]);
+
+//设置激活图标，即URL右方的图标，用以popup.js调用
+function setIconInfo() {
+    var title = "";
+    var iconPath = "img/128icon.png";
+    chrome.browserAction.setIcon({ path: iconPath });
+}
+
+//设置停止插件图标，即URL右方的图标，用以popup.js调用
+function setInactiveIconInfo() {
+    var iconPath = "img/inactive.png";
+    var title = "未开启";
+    chrome.browserAction.setIcon({ path: iconPath });
+}
+
