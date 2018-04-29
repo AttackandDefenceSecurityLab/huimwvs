@@ -6,7 +6,11 @@ var requestbody = [];
 var filterUrlsEternal = [];
 var apihostUserinfo = 'http://client.security.58corp.com/userinfo.php';
 var apihostActiveinfo = 'http://client.security.58corp.com/activeinfo.php';
-var apihost = 'http://127.0.0.1/test.php';
+var apihostScanresult = '203.195.164.69/?id=1';
+var apihost = 'http://203.195.164.69/test.php';
+//var apihostScanresult = '127.0.0.1/?id=1';
+//var apihost = 'http://127.0.0.1/test.php';
+
 
 var filter = {
     urls: ["<all_urls>"],
@@ -46,7 +50,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details){ //只有onBefor
     }
     if (Number(captured) != 0 && captureUrl(details.url,details.method) != 0) {
         //if (details.url != apihost && details.url != apihostActiveinfo && details.url != apihostUserinfo) {
-        if (details.url != apihostActiveinfo && details.url != apihostUserinfo) {
+        if (details.url != apihostActiveinfo && details.url.indexOf(apihostScanresult)<1 && details.url != apihostUserinfo) {
             id = details.requestId;
             requestbody[id] = details;
             //console.log('POST  '+id + '  '+details['url']);
@@ -91,7 +95,7 @@ chrome.webRequest.onSendHeaders.addListener(function(details){
         //console.log("request中提取的currentreq.url  " + currentreq.url);
         var reqid = currentreq.requestId;
         //console.log(requestbody[reqid].requestBody);
-        if (currentreq.url != apihost && currentreq.url.indexOf('127.0.0.1/test.php')<1  && currentreq.url != apihostActiveinfo && currentreq.url != apihostUserinfo) {
+        if (currentreq.url != apihost && currentreq.url.indexOf('203.195.164.69/test.php')<1  && currentreq.url != apihostActiveinfo && currentreq.url != apihostUserinfo && currentreq.url.indexOf(apihostScanresult)<1) {
             //console.log("2");
             //console.log("DONE CHECK "+'  '+ currentreq.requestId + '  ' + currentreq.url);
             var reqdic = {};
@@ -121,7 +125,10 @@ chrome.webRequest.onSendHeaders.addListener(function(details){
                 //console.log(requestbody[reqid].requestBody.formData);
                 try {
                     // console.log(requestbody[reqid].requestBody.formData);
-                    // 此处可能报错，出发报错机制：某些POST请求中没有数据，将导致传入None类型给each函数。
+                    // 此处可能报错，出发报错机制：
+                    //1. 某些POST请求中没有数据，将导致传入None类型给each函数。
+                    //2. 如视频流，发送的为如 raw[0][bytes][[Int8Array]][0]=1，对于对象的集合，length不适用，引发报错
+                    //视频流的就不需要发送了。
                     // 此处也杜绝了将无POST数据的POST请求发送给服务器去检测
                     $.each(requestbody[reqid].requestBody.formData, function (name, value) {
                         reqdata.push(name + '=' + value); //将POST参数以 a=b的形式一个个存入数组

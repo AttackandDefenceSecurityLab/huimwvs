@@ -2,23 +2,29 @@
 import redis
 import json
 from csrf import CsrfScan
+from sqli import SqliScan
+from xss import XssScan
 from modules.main import main
 import time
+import chardet
+from public import byteify
 
 r=redis.Redis(host='127.0.0.1',port=6379,db=0)
+
+
 while True:
     data=r.lpop('data')
-    print data
     #print data
     if data:
+        print "[ ------------- CHECK DATA ------------- ]"
         jsonData=json.loads(data)
-        csrf=main(CsrfScan(jsonData)) #传入的字典需要由插件判断是否存在某key，如cookie可能不存在，在进行 data['coookie']提取时会报错
-        if csrf:
-            print csrf
-        else:
-            print "no csrf"
+        jsonData=byteify(jsonData)
+        main(SqliScan(jsonData))
+        main(XssScan(jsonData))
+        main(CsrfScan(jsonData))
+        print "[ ------------- WAITING NEXT ------------- ]"
     else:
-        print "NO DATA"
+        #print "[ ------------- NO DATA ------------- ]"
         time.sleep(10)
 
 

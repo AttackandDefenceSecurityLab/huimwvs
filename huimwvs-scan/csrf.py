@@ -58,8 +58,12 @@ class CsrfScan(MePlugin):
                 cookie={}
                 cookies=rawC.split("; ")
                 for i in cookies:
-                    name=i.split("=",1)[0]
-                    value=i.split("=",1)[1]
+                    cookiedata=i.split("=",1)
+                    name=cookiedata[0]
+                    if len(cookiedata)>1:
+                        value=cookiedata[1]
+                    else:
+                        value=""
                     cookie[name]=value
                 return cookie
 
@@ -211,7 +215,7 @@ class CsrfScan(MePlugin):
         try: # 请求中可能不存在cookie，提取字典时会导致报错；如果没有cookie，则设置为空
             cookie = req_data['cookie']
         except:
-            print "无COOKIE ————————————————"
+            ##print "无COOKIE ————————————————"
             cookie=""
         #print cookie
         csrf=csrfCheck()

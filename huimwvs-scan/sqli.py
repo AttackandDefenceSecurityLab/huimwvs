@@ -99,9 +99,15 @@ class SqliScan(MePlugin):
             data.append(request_data)
         try:
             injection=sqlmap.main(data)
-        except Exception, e:
-            print e
-            return
+        # except Exception, e:
+        #     #pass
+        #     print "[ERROR] : ",
+        #     print Exception,
+        #     print "[INFO] : ",
+        #     print e
+        #     #return
+        except:
+            pass
 
 
         if injection and str(injection.get('data','not found')).find("Payload")!=-1:

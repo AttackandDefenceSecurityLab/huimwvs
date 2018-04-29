@@ -584,7 +584,8 @@ class Connect(object):
             elif ex.code == httplib.NOT_FOUND:
                 if raise404:
                     errMsg = "page not found (%d)" % code
-                    raise SqlmapConnectionException(errMsg)
+
+                    #raise SqlmapConnectionException(errMsg)
                 else:
                     debugMsg = "page not found (%d)" % code
                     singleTimeLogMessage(debugMsg, logging.DEBUG)
