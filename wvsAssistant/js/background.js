@@ -6,10 +6,10 @@ var requestbody = [];
 var filterUrlsEternal = [];
 var apihostUserinfo = 'http://client.security.58corp.com/userinfo.php';
 var apihostActiveinfo = 'http://client.security.58corp.com/activeinfo.php';
-var apihostScanresult = '203.195.164.69/?id=1';
-var apihost = 'http://203.195.164.69/test.php';
-//var apihostScanresult = '127.0.0.1/?id=1';
-//var apihost = 'http://127.0.0.1/test.php';
+//var apihostScanresult = '203.195.164.69/?id=1';
+//var apihost = 'http://203.195.164.69/test.php';
+var apihostScanresult = '127.0.0.1/?id=1';
+var apihost = 'http://127.0.0.1/test.php';
 
 //启动浏览器时判断插件是否被激活，设置图标
 if(localStorage.captureStatus == undefined){
@@ -31,28 +31,31 @@ var filter = {
     types: [ "main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 };
 
-console.log("OK");
+console.log("huimwvs Assistant start ");
 function captureUrl(reqUrl, method) { //过滤出带参数的请求，去除图片、CSS类没必要检测的请求，以保证检测质量。
-    var whilelist=["google.com","baidu.com"];
-    for(var h=0;h<whilelist.length;h++){
-        if(reqUrl.indexOf(whilelist[h])>=0){
+    var blacklist=["google.com","baidu.com"];
+    for(var h=0;h<blacklist.length;h++){
+        if(reqUrl.indexOf(blacklist[h])>=0){
             return 0;
         }
     }
-    if(method == "POST"){ //POST请求，直接通过
-        return 1;
-    }else{  //GET请求的处理
-    var suffix = [".jpg",".css",".js",".png", ".gif" ,".bmp", ".ico"];
-        if(reqUrl.indexOf("?")>=0 && reqUrl.indexOf("=")>=0){  //GET请求带参数
-            var domainUrl = reqUrl.split('?');  //检测GET请求的资源格式，JPG CSS JS等不通过
-            for (var j = 0; j < suffix.length; j++) {
-                if(domainUrl[0].indexOf(suffix[j])>=0){
-                    return 0;
-                }
-            }
+    checktarget=localStorage.checktarget;
+    if(reqUrl.indexOf(checktarget)>=0){
+        if(method == "POST"){ //POST请求，直接通过
             return 1;
-        }else {
-            return 0;
+        }else{  //GET请求的处理
+        var suffix = [".jpg",".css",".js",".png", ".gif" ,".bmp", ".ico"];
+            if(reqUrl.indexOf("?")>=0 && reqUrl.indexOf("=")>=0){  //GET请求带参数
+                var domainUrl = reqUrl.split('?');  //检测GET请求的资源格式，JPG CSS JS等不通过
+                for (var j = 0; j < suffix.length; j++) {
+                    if(domainUrl[0].indexOf(suffix[j])>=0){
+                        return 0;
+                    }
+                }
+                return 1;
+            }else {
+                return 0;
+            }
         }
     }
 }
@@ -121,7 +124,7 @@ chrome.webRequest.onSendHeaders.addListener(function(details){
         //console.log("request中提取的currentreq.url  " + currentreq.url);
         var reqid = currentreq.requestId;
         //console.log(requestbody[reqid].requestBody);
-        if (currentreq.url != apihost && currentreq.url.indexOf('203.195.164.69/test.php')<1  && currentreq.url != apihostActiveinfo && currentreq.url != apihostUserinfo && currentreq.url.indexOf(apihostScanresult)<1) {
+        if (currentreq.url != apihost && currentreq.url.indexOf(apihost)<1  && currentreq.url != apihostActiveinfo && currentreq.url != apihostUserinfo && currentreq.url.indexOf(apihostScanresult)<1) {
             //console.log("2");
             //console.log("DONE CHECK "+'  '+ currentreq.requestId + '  ' + currentreq.url);
             var reqdic = {};
@@ -205,6 +208,30 @@ chrome.webRequest.onSendHeaders.addListener(function(details){
         request_id += 1;
     }
 }, filter, ["requestHeaders"]);
+
+
+//打开配置选项，判断选项页面是否已经打开，如果已经打开就不再打开新标签
+function openOptions(firstTime) {
+    var url = "options.html";
+    if (firstTime)
+        url += "?firstTime=true";
+    var fullUrl = chrome.extension.getURL(url);
+    chrome.tabs.getAllInWindow(null, function(tabs) {
+        for (var i in tabs) { // check if Options page is open already
+            var tab = tabs[i];
+            if (tab.url == fullUrl) {
+                chrome.tabs.update(tab.id, { selected: true }); // select the tab
+                return;
+            }
+        }
+        chrome.tabs.getSelected(null, function(tab) { // open a new tab next to currently selected tab
+            chrome.tabs.create({
+                url: url,
+                index: tab.index + 1
+            });
+        });
+    });
+}
 
 //设置激活图标，即URL右方的图标，用以popup.js调用
 function setIconInfo() {

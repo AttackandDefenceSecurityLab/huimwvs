@@ -2153,11 +2153,15 @@ def setVerbosity():
     """
     This function set the verbosity of sqlmap output messages.
     """
-    conf.verbose = 0
+    # set the verbose -1, and the follow "if" would not go in.
+    conf.verbose = -1
     if conf.verbose is None:
         conf.verbose = 1
 
     conf.verbose = int(conf.verbose)
+    if conf.verbose == -1:
+        # setLevel 60, and all logging would not output for no this level.
+        logger.setLevel(60)
 
     if conf.verbose == 0:
         logger.setLevel(logging.ERROR)

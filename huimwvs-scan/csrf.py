@@ -235,8 +235,9 @@ class CsrfScan(MePlugin):
         else:
             #print url
             for form in forms:
-                self.plugin_info["target"] += "  --  表单："
-                self.plugin_info["target"] += re.findall("<form[\s\S]*?>",form)[0]
+                #self.plugin_info["target"] += "  --  表单："
+                payload = re.findall("<form[\s\S]*?>",form)[0]
+                self.payloads.append(payload)
             return True
             #csrf.show(result)
 

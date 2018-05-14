@@ -12,6 +12,10 @@ function stopCapture() {
     localStorage.captureStatus = 0;
     extension.setInactiveIconInfo();
 }
+function openOptions() {
+    closePopup();
+    extension.openOptions();
+}
 function startCapture() {
     closePopup();
     localStorage.captureStatus = 1;
@@ -20,7 +24,8 @@ function startCapture() {
 
 function scanResult(){
 	closePopup();
-	var scanResultUrl = 'http://203.195.164.69/?id=1';
+	//var scanResultUrl = 'http://203.195.164.69/?id=1';
+	var scanResultUrl = 'http://127.0.0.1/?id=1';
     chrome.tabs.create({
         url: scanResultUrl
     });
@@ -31,6 +36,7 @@ $(document).ready(function(){
 	$("#stopCapture").click(stopCapture);
 	$("#startCapture").click(startCapture);
 	$("#resultCheck").click(scanResult);
+	$("#menuOptions").click(openOptions);
 	captureStatus=localStorage.captureStatus;
 	if(captureStatus==undefined){
 		captureStatus=1;

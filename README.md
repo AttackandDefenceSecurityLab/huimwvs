@@ -21,15 +21,19 @@
 - L sqlmap优化
 - M xss插件
     - 存储型与DOM XSS检测
+- M去重
+    - 机器学习解决DGA式hash
+- H sqlmap 暂停终止程序
 - MMH hash collision插件
 - M csrf插件添加ajax检测
 - MH 敏感文件扫描插件
 
+- [x] H多线程
 - [x] MHH 扫描结果存入数据库
     - [x]  MHH 数据库连接池
-    - [x] 扫描器引擎调整
-    - [x] H php后台展示漏洞数据
-    - [x] H 插件查看后台数据结果页面
+- [x] 扫描器引擎调整
+- [x] H php后台展示漏洞数据
+- [x] H 插件查看后台数据结果页面
 
 ## BUG:
     - SQLMAP中，lib/request/connect.py 588行 raise SqlmapConnectionException(errMsg) 会偶尔导致调用sqlmap的程序也中断

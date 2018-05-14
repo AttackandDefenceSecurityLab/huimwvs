@@ -68,7 +68,6 @@ except KeyboardInterrupt:
     logger.error(errMsg)
 
     raise SystemExit
-
 def modulePath():
     """
     This will get us the program's directory, even if we are frozen
@@ -113,7 +112,6 @@ def main(url):
     """
     Main function of sqlmap when running from command line.
     """
-
     try:
         checkEnvironment()
 
@@ -141,7 +139,6 @@ def main(url):
         conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
-        #print conf.verbose
         init()
 
         if conf.profile:
@@ -153,7 +150,6 @@ def main(url):
         else:
             try:
                 injection=start()
-                #print injection
                 return injection
             except thread.error as ex:
                 if "can't start new thread" in getSafeExString(ex):
@@ -162,7 +158,6 @@ def main(url):
                     raise SystemExit
                 else:
                     raise
-
     except SqlmapUserQuitException:
         errMsg = "user quit"
         try:
@@ -350,8 +345,10 @@ def main(url):
             pass
         finally:
             # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
+            # if threads more than 1, may the project would not shutdown after the result had get.
             if threading.activeCount() > 1:
-                os._exit(0)
+                pass
+                #os._exit(0)
 
 if __name__ == "__main__":
     url=['sqlmap.py','-u','http://demo.aisec.cn/demo/aisec/click_link.php?id=2','--dbs','--batch','--dbms=mysql']

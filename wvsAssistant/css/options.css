@@ -1,0 +1,154 @@
+#hostInfo .panel-heading .nav-tabs {
+  float: right;
+  margin-right: -3px;
+  border: none;
+  border-left: 1px solid rgba(0,0,0,.09);
+  border-right: 1px solid rgba(0,0,0,.09);
+}
+#hostInfo .panel-heading .nav-tabs li {
+  border: none;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+}
+#hostInfo .panel-heading .nav-tabs li a {
+  background: transparent;
+  border: none;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 12px;
+  font-weight: 300;
+  height: 33px;
+  color: #333;
+}
+#hostInfo .panel-heading .nav-tabs li.active > a {
+  background: #00aced;
+  border: none;
+  color: #fff;
+}
+#hostInfo .panel-heading .nav-tabs li:hover {
+  border: none;
+}
+#hostInfo .panel-heading .nav-tabs li:last-child {
+  border-right: none;
+}
+#hostInfo .panel-body .tab-content {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+#hostInfo .panel .panel-heading .panel-actions a {
+  text-decoration: none;
+  font-size: 14px;
+  text-align: center;
+  display: inline-block;
+  line-height: 32px;
+  padding: 0;
+  margin: 0;
+  color: #333;
+  border-left: 1px solid rgba(0,0,0,.09);
+}
+#hostInfo .panel-actions .btn-setting:hover,
+#hostInfo .panel-actions .btn-minimize:hover,
+#hostInfo .panel-actions .btn-close:hover {
+  background-color: rgba(0,0,0,.05);
+}
+#hostInfo .panel .panel-heading .switch {
+  margin: 10px;
+}
+#hostInfo .panel .panel-body {
+  border-width: 1px 1px 2px;
+  border-style: solid;
+  border-top: none;
+  border-right-color: #ccc!important;
+  border-bottom-color: #ccc!important;
+  border-left-color: #ccc!important;
+}
+#hostInfo .panel .panel-body.no-padding {
+  padding: 0;
+}
+#hostInfo .panel .panel-body.padding-horizontal {
+  padding: 0 15px;
+}
+#hostInfo .panel .panel-body.no-padding-bottom {
+  padding-bottom: 0;
+}
+#hostInfo.panel-default {
+  border-radius: 0px;
+  border-top: 1px solid #d4d4d4;
+  -webkit-box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.1);
+}
+#hostInfo.panel.panel-heading {
+  line-height: 34px;
+  padding: 0 15px;
+  min-height: 34px;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  position: relative;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.05);
+  -moz-box-shadow: inset 0 -2px 0 rgba(0,0,0,.05);
+  -webkit-box-shadow: inset 0 -2px 0 rgba(0,0,0,.05);
+}
+#hostInfo.panel {
+  border:none;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  margin-bottom: 30px;
+}
+#hostInfo .panel .panel-body {
+  border-width: 1px 1px 2px;
+  border-style: solid;
+  border-top: none;
+  border-right-color: #ccc!important;
+  border-bottom-color: #ccc!important;
+  border-left-color: #ccc!important;
+}
+#hostInfo.panel .panel-body.no-padding {
+  padding: 0;
+}
+#hostInfo.panel .panel-body.padding-horizontal {
+  padding: 0 15px;
+}
+#hostInfo  .panel-body.no-padding-bottom {
+  padding-bottom: 0;
+}
+
+#hostInfo .panel-heading .panel-title {
+  line-height: 40px;
+}
+#hostInfo .panel-heading h2, #hostList .panel-heading h2{
+  height: 100%;
+  width: auto;
+  display: inline-block;
+  font-size: 14px;
+  position: relative;
+  margin: 0;
+  line-height: 34px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.red {color : #d95043;}
+.profileConf {
+  min-height: 520px;
+}
+
+#profileList .profileTemp, .templateHostRow{
+  display: none;
+}
+
+.selected li:first-child{
+  background: #f7f7f7;
+}

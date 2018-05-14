@@ -55,6 +55,7 @@ class VulType(object):
     business_logic_vul = '业务逻辑漏洞'
     csrf = '跨站请求伪造'
     other = '其他'
+    hashcollision='hash碰撞'
 
 
 class MePlugin(object):

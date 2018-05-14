@@ -31,7 +31,9 @@ class MySQLPool():
         values=""
         for key in sqldata:
             keys += key+","
-            values += "\"" + sqldata[key] + "\","
+            value =sqldata[key].replace("\"","\\\"")
+            values += "\"" + value + "\","
+            #print values
         sql += "(" + keys[:-1] + ") VALUES (" + values[:-1] + ")"
         #print sql
 

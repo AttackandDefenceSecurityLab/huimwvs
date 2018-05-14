@@ -4,6 +4,7 @@ from modules.scan import MePlugin
 import time
 import sys
 sys.path.append(sys.path[0]+'\\modules\\sqlmapsource')
+sys.path.append(sys.path[0]+'/modules/sqlmapsource')
 import sqlmap
 import urlparse
 import chardet
@@ -63,7 +64,6 @@ class SqliScan(MePlugin):
         验证类型，尽量不触发waf规则
         :return:
         """
-
         #url, premethod, cookie, prerequest_data, preUser_Agent, preip, prerefer = head_info_get(data, flag)
         url=self.flow_data['url']
         #print chardet.detect(url)
@@ -98,14 +98,13 @@ class SqliScan(MePlugin):
             data.append('--data')
             data.append(request_data)
         try:
+            print data
             injection=sqlmap.main(data)
         # except Exception, e:
-        #     #pass
         #     print "[ERROR] : ",
         #     print Exception,
         #     print "[INFO] : ",
         #     print e
-        #     #return
         except:
             pass
 
