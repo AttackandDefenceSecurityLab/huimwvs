@@ -6,10 +6,10 @@ var requestbody = [];
 var filterUrlsEternal = [];
 var apihostUserinfo = 'http://client.security.58corp.com/userinfo.php';
 var apihostActiveinfo = 'http://client.security.58corp.com/activeinfo.php';
-//var apihostScanresult = '203.195.164.69/?id=1';
-//var apihost = 'http://203.195.164.69/test.php';
-var apihostScanresult = '127.0.0.1/?id=1';
-var apihost = 'http://127.0.0.1/test.php';
+var apihostScanresult = '203.195.164.69/?id=1';
+var apihost = 'http://203.195.164.69/test.php';
+//var apihostScanresult = '127.0.0.1/?id=1';
+//var apihost = 'http://127.0.0.1/test.php';
 
 //启动浏览器时判断插件是否被激活，设置图标
 if(localStorage.captureStatus == undefined){
@@ -40,6 +40,7 @@ function captureUrl(reqUrl, method) { //过滤出带参数的请求，去除图�
         }
     }
     checktarget=localStorage.checktarget;
+    console.log(reqUrl.indexOf(checktarget));
     if(reqUrl.indexOf(checktarget)>=0){
         if(method == "POST"){ //POST请求，直接通过
             return 1;
@@ -54,10 +55,12 @@ function captureUrl(reqUrl, method) { //过滤出带参数的请求，去除图�
                 }
                 return 1;
             }else {
-                return 0;
+                //此处返回1， 即无参数的GET请求也将发送
+                return 1;
             }
         }
     }
+    return 0;
 }
 //获取post的请求数据，特别含有（POST请求）requestBody部分
 chrome.webRequest.onBeforeRequest.addListener(function(details){ //只有onBeforeRequest阶段的details，存在POST数据(requestBody)，在其后该字段会变为requestHeaders
@@ -211,27 +214,27 @@ chrome.webRequest.onSendHeaders.addListener(function(details){
 
 
 //打开配置选项，判断选项页面是否已经打开，如果已经打开就不再打开新标签
-function openOptions(firstTime) {
-    var url = "options.html";
-    if (firstTime)
-        url += "?firstTime=true";
-    var fullUrl = chrome.extension.getURL(url);
-    chrome.tabs.getAllInWindow(null, function(tabs) {
-        for (var i in tabs) { // check if Options page is open already
-            var tab = tabs[i];
-            if (tab.url == fullUrl) {
-                chrome.tabs.update(tab.id, { selected: true }); // select the tab
-                return;
+    function openOptions(firstTime) {
+        var url = "options.html";
+        if (firstTime)
+            url += "?firstTime=true";
+        var fullUrl = chrome.extension.getURL(url);
+        chrome.tabs.getAllInWindow(null, function(tabs) {
+            for (var i in tabs) { // check if Options page is open already
+                var tab = tabs[i];
+                if (tab.url == fullUrl) {
+                    chrome.tabs.update(tab.id, { selected: true }); // select the tab
+                    return;
+                }
             }
-        }
-        chrome.tabs.getSelected(null, function(tab) { // open a new tab next to currently selected tab
-            chrome.tabs.create({
-                url: url,
-                index: tab.index + 1
+            chrome.tabs.getSelected(null, function(tab) { // open a new tab next to currently selected tab
+                chrome.tabs.create({
+                    url: url,
+                    index: tab.index + 1
+                });
             });
         });
-    });
-}
+    }
 
 //设置激活图标，即URL右方的图标，用以popup.js调用
 function setIconInfo() {

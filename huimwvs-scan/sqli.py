@@ -43,21 +43,26 @@ class SqliScan(MePlugin):
         匹配是否调用此插件
         :return:
         """
-        method=self.flow_data['method']
-        url=self.flow_data['url']
-        # GET需要有? = 带参特征
-        if method=='GET':
-            if '?' in url and '=' in url:
-                return True
-            else:
-                return False
-        #POST 需要有data 带参特征
+        newpara = self.flow_data.get('newparas',"")
+        if newpara:
+            return True
         else:
-            # 虽然前段已验证只发送带参数的POST数据，但此处严谨过滤较好
-            if ('?' in url and '=' in url) or self.flow_data.get('request_data'):
-                return True
-            else:
-                return False
+            return False
+        # method=self.flow_data['method']
+        # url=self.flow_data['url']
+        # # GET需要有? = 带参特征
+        # if method=='GET':
+        #     if '?' in url and '=' in url:
+        #         return True
+        #     else:
+        #         return False
+        # #POST 需要有data 带参特征
+        # else:
+        #     # 虽然前段已验证只发送带参数的POST数据，但此处严谨过滤较好
+        #     if ('?' in url and '=' in url) or self.flow_data.get('request_data'):
+        #         return True
+        #     else:
+        #         return False
 
     def check(self):
         """
@@ -98,7 +103,7 @@ class SqliScan(MePlugin):
             data.append('--data')
             data.append(request_data)
         try:
-            print data
+            #print data
             injection=sqlmap.main(data)
         # except Exception, e:
         #     print "[ERROR] : ",

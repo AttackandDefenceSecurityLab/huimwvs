@@ -17,11 +17,25 @@ import pycurl
 #     return 1000000
 #     #return (end-start)
 
+class ReFerBuf:
+    def __init__(self):
+            self.contents = ''
+    def body_callback(self,buf):
+            self.contents = self.contents + buf
+
+
 def control(input_url,data):
+        t=ReFerBuf()
         c = pycurl.Curl()
+        #print "set1"
         c.setopt(pycurl.URL,input_url)
+        c.setopt(pycurl.WRITEFUNCTION,t.body_callback)
+        #print "set2"
         c.setopt(pycurl.POSTFIELDS,  data)
+        c.setopt(pycurl.VERBOSE,0)
+        #print "perform"
         c.perform()
+        #print "gettime"
         http_total_time = c.getinfo(pycurl.TOTAL_TIME)
         return http_total_time
 
@@ -40,8 +54,10 @@ def check(url):
 
 
     times={}
+    print "null"
     times["null"]=control(url,nulldata)
     time.sleep(1)
+    print "normal"
     times["normal"]=control(url,normaldata)  #利用normal，算出发送大量数据的时间，所占比例约为 (normal-null)*4/5
     time.sleep(1)
 
@@ -55,10 +71,18 @@ def check(url):
     limit=base*30
 
     # 根据存放各数据文件的大小，按比例算出大概的发送数据的时间，从整个请求的时间中去除
-    times["phpjson"]=control(url,phpjsondata)-1.36*trantime
+    print "php"
+    phptime=control(url,phpjsondata)
+    print "PHP TIME => ",
+    print phptime
+    times["phpjson"]=phptime-1.36*trantime
+    print "java"
     times["javajson"]=control(url,javajsondata)-2.3*trantime
 
     for name in times:
+        print name,
+        print '  ==>  ',
+        print times[name]
         if times[name]>limit:
             print "Probably have HashCollision==>",
             print name+":",
@@ -66,5 +90,5 @@ def check(url):
 
 
 if __name__ == '__main__':
-    url="http://203.195.164.69/tt.php"
+    url="http://testphp.vulnweb.com/categories.php"
     check(url)

@@ -14,6 +14,16 @@ function closeWindow() {
     }
     window.close();
 }
+
+//初始化页面
+//修改前端"测试目标"为存储的目标
+function initPage(){
+    if(localStorage.checktarget != undefined){
+        info=localStorage.checktarget;
+        $("#batch-add").attr("value",info);
+        $("#batch-add").css("background-color","#F0F0F0");
+    }
+}
 document.addEventListener('DOMContentLoaded', function() {
     $("#profileSave").click(saveOptions);
     $("#batch-add").click(function(){
@@ -23,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $("#btnClose").click(function () {
         closeWindow();
     });
-       
+    initPage();
 });
 
 

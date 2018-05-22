@@ -48,7 +48,11 @@ class XssScan(MePlugin):
         匹配是否调用此插件
         :return:
         """
-        return True
+        newpara = self.flow_data.get('newparas',"")
+        if newpara:
+            return True
+        else:
+            return False
     def dynamic_scan(flow_data):
         vulurllist = self.prescan()
 

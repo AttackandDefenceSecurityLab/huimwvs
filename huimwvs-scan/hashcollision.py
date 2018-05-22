@@ -14,8 +14,8 @@ class HashcollisionScan(MePlugin):
         super(self.__class__, self).__init__()
         if flow_data != 0:
             self.flow_data=flow_data  #如果接收到扫描器传入的链接资源，则采用它；否则该程序的链接资源来自测试对象，为测试使用。
-            arr = urlparse.urlparse(self.flow_data['url'])
-            self.target=urlparse.urlunsplit((arr.scheme, arr.netloc, arr.path, '', ''))
+        arr = urlparse.urlparse(self.flow_data['url'])
+        self.target=urlparse.urlunsplit((arr.scheme, arr.netloc, arr.path, '', ''))
         self.plugin_info = {
             "name": "hash碰撞检测插件",  # 插件的名称
             "product": "json等传输POST数据的URL",  # 该插件所针对的应用名称,严格按照文档上的进行填写
@@ -34,6 +34,10 @@ class HashcollisionScan(MePlugin):
             "target": self.target  #漏洞目标
         }
 
+    #接收pycurl返回的响应内容，否则会直接print出来
+    def body_callback(self,buf):
+        pass
+
     def match(self):
         """
         匹配是否调用此插件
@@ -47,6 +51,7 @@ class HashcollisionScan(MePlugin):
     def control(self,input_url,data):
         c = pycurl.Curl()
         c.setopt(pycurl.URL,input_url)
+        c.setopt(pycurl.WRITEFUNCTION,self.body_callback)
         c.setopt(pycurl.POSTFIELDS,  data)
         c.perform()
         http_total_time = c.getinfo(pycurl.TOTAL_TIME)
@@ -57,39 +62,44 @@ class HashcollisionScan(MePlugin):
         :return:
         """
         url=self.flow_data['url']
-        nulldata=open("null.txt","r").readline()
-        normaldata=open("normal.txt","r").readline()
-        phpjsondata=open("phpjsonByPython_15_size.txt","r").readline()
-        javajsondata=open("javajson.txt","r").readline()
+        print "URL ==> "+url
+        try:
+            nulldata=open("null.txt","r").readline()
+            normaldata=open("normal.txt","r").readline()
+            phpjsondata=open("phpjsonByPython_15_size.txt","r").readline()
+            javajsondata=open("javajson.txt","r").readline()
 
 
-        times={}
-        times["null"]=self.control(url,nulldata)
-        time.sleep(1)
-        times["normal"]=self.control(url,normaldata)  #利用normal，算出发送大量数据的时间，所占比例约为 (normal-null)*4/5
-        time.sleep(1)
+            times={}
+            times["null"]=self.control(url,nulldata)
+            time.sleep(1)
+            times["normal"]=self.control(url,normaldata)  #利用normal，算出发送大量数据的时间，所占比例约为 (normal-null)*4/5
+            time.sleep(1)
 
-        #trantime为发送大量数据所占用时间
-        trantime=(times["normal"]-times["null"])*4/5
+            #trantime为发送大量数据所占用时间
+            trantime=(times["normal"]-times["null"])*4/5
 
-        #base为发送无数据请求+服务器页面运行的时间，约等于服务器页面运算的时间
-        base=times["normal"]-trantime
+            #base为发送无数据请求+服务器页面运行的时间，约等于服务器页面运算的时间
+            base=times["normal"]-trantime
 
-        #根据测算，大于limit界限时间可能存在hash碰撞。
-        limit=base*30
+            #根据测算，大于limit界限时间可能存在hash碰撞。
+            limit=base*30
 
-        # 根据存放各数据文件的大小，按比例算出大概的发送数据的时间，从整个请求的时间中去除
-        times["phpjson"]=self.control(url,phpjsondata)-1.36*trantime
-        times["javajson"]=self.control(url,javajsondata)-2.3*trantime
+            # 根据存放各数据文件的大小，按比例算出大概的发送数据的时间，从整个请求的时间中去除
+            times["phpjson"]=self.control(url,phpjsondata)-1.36*trantime
+            times["javajson"]=self.control(url,javajsondata)-2.3*trantime
 
-        IfExist=False
-        for name in times:
-            if times[name]>limit:
-                print "Probably have HashCollision==>",
-                payload="TYPE : "+name+" SERVER RUNNING TIME : "+str(times[name])
-                self.payloads.append(payload)
-                IfExist=True
-        return IfExist
+            IfExist=False
+            for name in times:
+                if times[name]>limit:
+                    print "Probably have HashCollision==>",
+                    payload="TYPE : "+name+" SERVER RUNNING TIME : "+str(times[name])
+                    self.payloads.append(payload)
+                    IfExist=True
+            return IfExist
+        except:
+            print "-------------connect error-------------"
+            return False
 
     def result(self):
         """
@@ -102,3 +112,8 @@ class HashcollisionScan(MePlugin):
 if __name__ == '__main__':
     from modules.main import main
     main(HashcollisionScan())
+    main(HashcollisionScan())
+    main(HashcollisionScan())
+    main(HashcollisionScan())
+    main(HashcollisionScan())
+
